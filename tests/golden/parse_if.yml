@@ -1,0 +1,150 @@
+test_level: parse
+text: |-
+  void main() {
+    while(a++) {
+      b = b + 1;
+      break;
+    }
+
+    if(abc > dfe) 
+      f(1);
+
+    if(abc > dfe) 
+      f(1);
+    else
+      f(2);
+
+    if(abc > dfe) {
+      f(11);
+    } else {
+      f(22);
+    }
+    
+    int a = asd == vwd ? 111 : 222;
+    
+    return 1;
+    return;
+  }
+parse_tree: |
+  start
+    decl_fun
+      decl_fun_sig
+        void
+        main
+      block
+        statements
+          statement
+            st_while
+              expression
+                ex_postfix
+                  expression	a
+                  ++
+              block_or_line
+                block
+                  statements
+                    statement
+                      expression
+                        ex_binary
+                          expression
+                            ex_binary
+                              expression	b
+                              =
+                              expression	b
+                          +
+                          expression
+                            literal
+                              lit_int	1
+                    statement
+                      expression	break
+          statement
+            st_if
+              expression
+                ex_binary
+                  expression	abc
+                  >
+                  expression	dfe
+              block_or_line
+                statement
+                  expression
+                    ex_call
+                      f
+                      expression
+                        literal
+                          lit_int	1
+              None
+          statement
+            st_if
+              expression
+                ex_binary
+                  expression	abc
+                  >
+                  expression	dfe
+              block_or_line
+                statement
+                  expression
+                    ex_call
+                      f
+                      expression
+                        literal
+                          lit_int	1
+              block_or_line
+                statement
+                  expression
+                    ex_call
+                      f
+                      expression
+                        literal
+                          lit_int	2
+          statement
+            st_if
+              expression
+                ex_binary
+                  expression	abc
+                  >
+                  expression	dfe
+              block_or_line
+                block
+                  statements
+                    statement
+                      expression
+                        ex_call
+                          f
+                          expression
+                            literal
+                              lit_int	11
+              block_or_line
+                block
+                  statements
+                    statement
+                      expression
+                        ex_call
+                          f
+                          expression
+                            literal
+                              lit_int	22
+          statement
+            decl_var
+              var_sig
+                int
+                a
+              expression
+                ex_binary
+                  expression	asd
+                  ==
+                  expression
+                    ex_conditional
+                      expression	vwd
+                      expression
+                        literal
+                          lit_int	111
+                      expression
+                        literal
+                          lit_int	222
+          statement
+            st_cmd
+              return
+              expression
+                literal
+                  lit_int	1
+          statement
+            expression	return

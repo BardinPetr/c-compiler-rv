@@ -1,0 +1,128 @@
+test_level: parse
+text: |-
+  void main() {
+      int a;
+      int a = 12;
+      char a = 'a';
+      int a = "asdasd\n\\\"";
+
+      int b = a + (a * (b / c) & d);
+      int c = a + (-a * -3);
+      int d = b(1, 'a') + c();
+      d++;
+  }
+parse_tree: |
+  start
+    decl_fun
+      decl_fun_sig
+        void
+        main
+      block
+        statements
+          statement
+            decl_var
+              var_sig
+                int
+                a
+              None
+          statement
+            decl_var
+              var_sig
+                int
+                a
+              expression
+                literal
+                  lit_int	12
+          statement
+            decl_var
+              var_sig
+                char
+                a
+              expression
+                literal
+                  lit_char	a
+          statement
+            decl_var
+              var_sig
+                int
+                a
+              expression
+                literal
+                  lit_string
+                    a
+                    s
+                    d
+                    a
+                    s
+                    d
+                    \n
+                    \\
+                    \"
+          statement
+            decl_var
+              var_sig
+                int
+                b
+              expression
+                ex_binary
+                  expression	a
+                  +
+                  expression
+                    expression
+                      ex_binary
+                        expression
+                          ex_binary
+                            expression	a
+                            *
+                            expression
+                              expression
+                                ex_binary
+                                  expression	b
+                                  /
+                                  expression	c
+                        &
+                        expression	d
+          statement
+            decl_var
+              var_sig
+                int
+                c
+              expression
+                ex_binary
+                  expression	a
+                  +
+                  expression
+                    expression
+                      ex_prefix
+                        -
+                        expression
+                          ex_binary
+                            expression	a
+                            *
+                            expression
+                              literal
+                                lit_int	-3
+          statement
+            decl_var
+              var_sig
+                int
+                d
+              expression
+                ex_binary
+                  expression
+                    ex_call
+                      b
+                      expression
+                        literal
+                          lit_int	1
+                      expression
+                        literal
+                          lit_char	a
+                  +
+                  expression
+                    ex_call	c
+          statement
+            expression
+              ex_postfix
+                expression	d
+                ++

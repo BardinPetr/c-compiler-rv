@@ -1,0 +1,28 @@
+[project]
+name = "compiler-py-impl"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Bardin Petr",email = "bardin.petr@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "lark (>=1.2.2,<2.0.0)"
+]
+packages = [
+    { include = "parser", from = "src" },
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.5"
+pytest-golden = "^0.2.2"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests/*"]
+enable_assertion_pass_hook = true

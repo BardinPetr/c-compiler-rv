@@ -1,0 +1,51 @@
+test_level: parse
+text: |-
+  void puts(int string);
+
+  void a() {
+  }
+
+  int b(int a, char b) {
+    return 1;
+  }
+
+  int c() {
+  }
+parse_tree: |
+  start
+    decl_fun_sig
+      void
+      puts
+      var_sig
+        int
+        string
+    decl_fun
+      decl_fun_sig
+        void
+        a
+      block
+        statements
+    decl_fun
+      decl_fun_sig
+        int
+        b
+        var_sig
+          int
+          a
+        var_sig
+          char
+          b
+      block
+        statements
+          statement
+            st_cmd
+              return
+              expression
+                literal
+                  lit_int	1
+    decl_fun
+      decl_fun_sig
+        int
+        c
+      block
+        statements

@@ -1,0 +1,141 @@
+start: _decl_globals*
+
+
+// templates
+
+_sep{x}: x ("," x)*
+_sep0{x}: _sep{x}?
+_paren{x}: "(" x ")"
+_brack{x}: "[" x "]"
+_brace{x}: "{" x "}"
+
+// declarations
+
+_decl_globals: decl_fun_sig ";"
+             | decl_fun
+
+decl_fun: decl_fun_sig block
+
+decl_fun_sig: TYP CNAME _paren{_sep0{var_sig}}
+
+var_sig: TYP CNAME
+
+decl_var: var_sig ["=" expression]
+
+
+// statements
+
+statement: (expression | decl_var | st_cmd) ";"
+         | st_if
+         | st_while
+
+st_cmd: KW_BREAK | KW_RETURN expression?
+
+st_if: "if" _paren{expression} block_or_line ["else" block_or_line]
+
+st_while: "while" _paren{expression} block_or_line
+
+// blocks
+
+statements: statement*
+block: _brace{ statements }
+
+block_or_line: block | statement
+
+// expressions
+
+ex_prefix: UOP_PREFIX expression
+         | KW_SIZEOF _paren{TYP}
+
+ex_postfix: expression UOP_POSTFIX
+
+ex_call: CNAME _paren{_sep0{expression}}
+
+ex_binary: expression BOP expression
+
+ex_conditional: expression "?" expression ":" expression
+
+expression: _paren{expression}
+          | CNAME
+          | literal
+          | ex_prefix
+          | ex_postfix
+          | ex_call
+          | ex_binary
+          | ex_conditional
+
+
+// literals
+
+literal: lit_int
+       | lit_char
+       | lit_string
+
+lit_int: SIG_INTEGER
+lit_char: "'" STRING_CHAR "'"
+lit_string: "\"" STRING_CHAR* "\""
+
+
+// terminals
+
+BOP: OP_MAT | OP_LOG | OP_CMP | OP_ASN
+
+OP_ASN: "="
+
+OP_MAT: MAT_STAR | MAT_DIV | MAT_MOD | MAT_PLUS | MAT_MINUS
+MAT_PLUS: "+"
+MAT_MINUS: "-"
+MAT_STAR: "*"
+MAT_DIV: "/"
+MAT_MOD: "%"
+
+OP_LOG: LOG_XOR | LOG_AND | LOG_OR | LOG_LAND | LOG_LOR | LOG_RIGHT | LOG_LEFT
+LOG_XOR: "^"
+LOG_AND: "&"
+LOG_OR: "|"
+LOG_LAND: "&&"
+LOG_LOR: "||"
+LOG_RIGHT: ">>"
+LOG_LEFT: "<<"
+
+OP_CMP: CMP_LE | CMP_LT | CMP_GE | CMP_GT | CMP_EQ | CMP_NE
+CMP_LE: "<="
+CMP_LT: "<"
+CMP_GE: ">="
+CMP_GT: ">"
+CMP_EQ: "=="
+CMP_NE: "!="
+
+UOP_PREFIX: UOP_NEG | UOP_INV | UOP_SUB
+UOP_NEG: "!"
+UOP_INV: "~"
+UOP_SUB: "-"
+
+UOP_POSTFIX: UOP_DEC | UOP_INC
+UOP_DEC: "--"
+UOP_INC: "++"
+
+KW_BREAK: "break"
+KW_RETURN: "return"
+KW_SIZEOF: "sizeof"
+
+TYP: TYP_CHAR | TYP_INT | TYP_VOID
+TYP_INT: "int"
+TYP_CHAR: "char"
+TYP_VOID: "void"
+
+LETTER: "a".."z" | "A".."Z"
+WORD: LETTER+
+CNAME: ("_" | LETTER) ("_" | LETTER | DIGIT)*
+DIGIT: "0".."9"
+INTEGER: DIGIT+
+SIG_INTEGER: ["+"|"-"] INTEGER
+STRING_CHAR: /[^"\\]|\\[nt"\\]/
+
+WS: /[ \t\r\n]/+
+COMMENT: /\/\/[^\n]*/
+MULTILINE_COMMENT: "/*" /(.|\n)*?/ "*/"
+
+%ignore WS
+%ignore COMMENT
+%ignore MULTILINE_COMMENT
