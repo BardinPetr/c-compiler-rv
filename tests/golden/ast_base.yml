@@ -1,0 +1,68 @@
+test_level: parse,ast
+text: |-
+  void main() {
+      int a;
+      int b = 12;
+      char c = 'a';
+      int s = "asd\n\t\\\"dsa";
+  }
+
+ast_tree: Tree(Token('RULE', 'start'), [Tree(Token('RULE', 'decl_fun'), [Tree(Token('RULE',
+  'decl_fun_sig'), [Token('TYP', 'void'), Token('CNAME', 'main')]), Tree(Token('RULE',
+  'block'), [Tree(Token('RULE', 'statements'), [Tree(Token('RULE', 'statement'), [Tree(Token('RULE',
+  'decl_var'), [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME',
+  'a')]), None])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'),
+  [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME', 'b')]), Tree(Token('RULE',
+  'expression'), [12])])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'),
+  [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'char'), Token('CNAME', 'c')]), Tree(Token('RULE',
+  'expression'), ['a'])])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE',
+  'decl_var'), [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME',
+  's')]), Tree(Token('RULE', 'expression'), ['asd\n\t\\"dsa'])])])])])])])
+parse_tree: |
+  start
+    decl_fun
+      decl_fun_sig
+        void
+        main
+      block
+        statements
+          statement
+            decl_var
+              var_sig
+                int
+                a
+              None
+          statement
+            decl_var
+              var_sig
+                int
+                b
+              expression
+                literal
+                  lit_int	12
+          statement
+            decl_var
+              var_sig
+                char
+                c
+              expression
+                literal
+                  lit_char	a
+          statement
+            decl_var
+              var_sig
+                int
+                s
+              expression
+                literal
+                  lit_string
+                    a
+                    s
+                    d
+                    \n
+                    \t
+                    \\
+                    \"
+                    d
+                    s
+                    a

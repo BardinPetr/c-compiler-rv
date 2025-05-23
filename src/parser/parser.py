@@ -1,10 +1,9 @@
 from os.path import dirname, realpath, join
 
-from lark import Lark
+from lark import Lark, Tree
 
 parser = Lark(open(join(dirname(realpath(__file__)), "grammar.lark")))
 
 
-def parse(text):
-    tree = parser.parse(text)
-    return tree
+def do_parse(text: str) -> Tree:
+    return parser.parse(text)
