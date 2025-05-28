@@ -1,4 +1,4 @@
-start: _decl_globals*
+start: _decl_global*
 
 
 // templates
@@ -11,7 +11,8 @@ _brace{x}: "{" x "}"
 
 // declarations
 
-_decl_globals: decl_fun_sig ";"
+_decl_global: decl_fun_sig ";"
+             | decl_var ";"
              | decl_fun
 
 decl_fun: decl_fun_sig block
@@ -53,8 +54,6 @@ ex_call: CNAME _paren{_sep0{expression}}
 
 ex_binary: expression BOP expression
 
-ex_conditional: expression "?" expression ":" expression
-
 expression: _paren{expression}
           | CNAME
           | literal
@@ -62,7 +61,6 @@ expression: _paren{expression}
           | ex_postfix
           | ex_call
           | ex_binary
-          | ex_conditional
 
 
 // literals

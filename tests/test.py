@@ -2,6 +2,7 @@ import pytest
 from pytest_golden.plugin import GoldenTestFixture
 
 from parser.parser import do_parse
+from printer.transformer import do_asm
 from syntax.transformer import do_ast
 
 @pytest.mark.golden_test("golden/*.yml")
@@ -16,6 +17,8 @@ def test_golden(golden: GoldenTestFixture):
 
     if 'ast' in test_level:
         ast = do_ast(tree)
-        print(ast)
         assert str(ast) == golden.out['ast_tree'], "AST mismatch"
 
+    if 'asm' in test_level:
+        asm = do_asm(ast)
+        assert str(asm) == golden.out['asm'], "ASM mismatch"

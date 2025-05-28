@@ -21,6 +21,7 @@ build/kernel: kernel.ld build/kernel.o build/stdlib.o
 
 qemu: build/kernel
 	qemu-system-riscv64 \
+		-smp 2 \
 		-machine sifive_u \
 		-nographic -bios none \
 		-kernel $<
