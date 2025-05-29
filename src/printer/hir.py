@@ -1,15 +1,16 @@
 """ Hardware-oriented IR extensions """
 
 from dataclasses import dataclass, field
-from enum import StrEnum, auto
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from printer.reg import Reg
 
 
 @dataclass
 class HVar:
-    pass
+    def __str__(self):
+        return self.__repr__()
+
 
 @dataclass
 class HStackVar(HVar):
@@ -17,20 +18,34 @@ class HStackVar(HVar):
     size: int = 8
     name: str = ""
 
+    def __repr__(self):
+        return f"HStkVar@{self.pos}"
+
 @dataclass
 class HStackRegCopy(HStackVar):
     pos: int = 0
     reg: Reg = None
     name: str = ""
 
+    def __repr__(self):
+        return f"HStkVar@{self.pos}(copy of {self.reg.code if self.reg else '?'})"
+
+
 @dataclass
 class HRegVar(HVar):
     reg: Reg
     name: str = ""
 
+    def __repr__(self):
+        return f"HRegVar({self.reg.code if self.reg else '?'})"
+
+
 @dataclass
 class HMemVar(HVar):
     label: str
+
+    def __repr__(self):
+        return f"HMemVar({self.label})"
 
 
 @dataclass

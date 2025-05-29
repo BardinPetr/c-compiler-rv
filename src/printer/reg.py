@@ -3,6 +3,7 @@ from typing import List
 
 
 class RegisterType(IntEnum):
+    LOCAL = auto()
     SCRATCH = auto()
     ARGUMENT = auto()
     RETURN = auto()
@@ -35,8 +36,12 @@ class Reg(Enum):
         return cls.by(RegisterType.RETURN)
 
     @classmethod
-    def scratch(cls) -> List['Reg']:
+    def one_time(cls) -> List['Reg']:
         return cls.by(RegisterType.SCRATCH)
+
+    @classmethod
+    def locals(cls) -> List['Reg']:
+        return cls.by(RegisterType.LOCAL)
 
     @classmethod
     def caller_saved(cls) -> List['Reg']:

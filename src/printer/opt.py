@@ -1,7 +1,26 @@
-from printer.ir import *
 from printer.hir import *
+from printer.ir import *
 from printer.rv64 import RV64Reg
 from utils import random_string
+
+
+def detect_locals(fun: IRFun) -> Dict[str, Tuple[int, int]]:
+    """
+    найти используемые переменные, заодно оценить частоту использования
+    :return (r, w)
+    """
+    if not fun.is_impl: return {}
+
+    result = {}
+    for i in fun.body:
+        if isinstance(i, IRStatement):
+            for v in i.v_inputs:
+                if v not in result: result[v] = [0, 0]
+                result[v][0] += 1
+            for v in i.v_outputs:
+                if v not in result: result[v] = [0, 0]
+                result[v][1] += 1
+    return result
 
 
 class RV64IR2HIRTransformer:
@@ -15,11 +34,11 @@ class RV64IR2HIRTransformer:
         return self.ctx
 
     def fun_allocate_vars(self, fun: IRFun) -> IRFun:
-        if not fun.is_impl: return fun
         """
         назначить переменным ir регистры или стек или зарезервированную память.
         добавить псевдо-команды для перехода от одного к другому типов памяти.
         """
+        if not fun.is_impl: return fun
         fun.layout = HFunLayout()
         slots = fun.layout.mem_slots
 
@@ -31,18 +50,45 @@ class RV64IR2HIRTransformer:
         for i, p in enumerate(fun.params):
             slots[p.name] = HStackVar(name=p.name)
 
-        free_regs = self.regmap.scratch()[:]
+        all_locals = detect_locals(fun)
+        local_regs_to_assign = self.regmap.locals()
 
-        slots['a'] = HRegVar(RV64Reg.T1)
-        slots['b'] = HRegVar(RV64Reg.T2)
-        slots['c'] = HRegVar(RV64Reg.T3)
-        slots['d'] = HRegVar(RV64Reg.T4)
-        # slots['d'] = HStackVar()
+        # в качестве простейшей оптимизации отображаем в регистры наиболее часто используемые переменные
+        # увы, времени на что-то более адекватное (например отслеживать времена жизни переменных) времени у нас не хватило
+        locals_to_assign = sorted(all_locals.items(), key=lambda x: -sum(x[1]))
+        for name, (use_r, _) in locals_to_assign:
+            if name in slots:  # могут попасться имена которые уже кудато сосланы
+                continue
+            if len(local_regs_to_assign) > 0 and \
+                    use_r > 0:  # игнорируем те переменные, что не читаются
+                reg = local_regs_to_assign.pop(0)
+                # назначаем регистр
+                slots[name] = HRegVar(reg, name=name)
+            else:
+                # когда кончились регистры, оставшиеся переменные загоняем на стек
+                slots[name] = HStackVar(name=name)
 
-        # TODO allocate vars
+        # print("-" * 10, fun.name)
+        # print(slots)
 
-        # TODO insert HIRMoves
+        return fun
 
+    def fun_add_var_moves(self, fun: IRFun) -> IRFun:
+        """
+        вставить адаптеры когда надо чтобы переменная оказалась в регистре (и наоборот),
+        а ее внезапно аллоцировали не в регистр, а в память (стек)
+        """
+        res = []
+        for i in fun.body:
+            for v_i in i.v_inputs:
+                pass
+
+            res.append(i)
+
+            for v_o in i.v_outputs:
+                pass
+
+        fun.body = res
         return fun
 
     def fun_extract_strings(self, fun: IRFun) -> IRFun:
@@ -54,7 +100,7 @@ class RV64IR2HIRTransformer:
                 self.ctx.globals.append(
                     IRGlobal(label, IRType.STRING, IRStringValue(v.value.value))
                 )
-                v.value.value = label # replace actual string with label
+                v.value.value = label  # replace actual string with label
         return fun
 
     def fun_prepare_stack(self, fun: IRFun) -> IRFun:
@@ -82,4 +128,5 @@ class RV64IR2HIRTransformer:
         fun = self.fun_extract_strings(fun)
         fun = self.fun_allocate_vars(fun)
         fun = self.fun_prepare_stack(fun)
+        fun = self.fun_add_var_moves(fun)
         return fun

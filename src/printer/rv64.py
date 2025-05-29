@@ -10,13 +10,13 @@ class RV64Reg(Reg):
     TP = ("tp", [])
     FP = ("fp", [RegisterType.CALLEE_SAVED])
 
-    T0 = ("t0", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
-    T1 = ("t1", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
-    T2 = ("t2", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
-    T3 = ("t3", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
-    T4 = ("t4", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
-    T5 = ("t5", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
-    T6 = ("t6", [RegisterType.CALLER_SAVED])  # , RegisterType.SCRATCH
+    T0 = ("t0", [RegisterType.CALLER_SAVED]) # RegisterType.SCRATCH
+    T1 = ("t1", [RegisterType.CALLER_SAVED]) # RegisterType.SCRATCH
+    T2 = ("t2", [RegisterType.SCRATCH, RegisterType.CALLER_SAVED])
+    T3 = ("t3", [RegisterType.SCRATCH, RegisterType.CALLER_SAVED])
+    T4 = ("t4", [RegisterType.SCRATCH, RegisterType.CALLER_SAVED])
+    T5 = ("t5", [RegisterType.SCRATCH, RegisterType.CALLER_SAVED])
+    T6 = ("t6", [RegisterType.SCRATCH, RegisterType.CALLER_SAVED])
 
     A0 = ("a0", [RegisterType.ARGUMENT, RegisterType.CALLER_SAVED, RegisterType.RETURN])
     A1 = ("a1", [RegisterType.ARGUMENT, RegisterType.CALLER_SAVED, RegisterType.RETURN])
@@ -28,17 +28,17 @@ class RV64Reg(Reg):
     A7 = ("a7", [RegisterType.ARGUMENT, RegisterType.CALLER_SAVED])
 
     # S0 = ("s0", [RegisterType.CALLEE_SAVED]) -> FP
-    S1 = ("s1", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S2 = ("s2", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S3 = ("s3", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S4 = ("s4", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S5 = ("s5", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S6 = ("s6", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S7 = ("s7", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S8 = ("s8", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S9 = ("s9", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S10 = ("s10", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
-    S11 = ("s11", [RegisterType.SCRATCH, RegisterType.CALLEE_SAVED])
+    S1 = ("s1", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S2 = ("s2", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S3 = ("s3", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S4 = ("s4", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S5 = ("s5", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S6 = ("s6", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S7 = ("s7", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S8 = ("s8", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S9 = ("s9", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S10 = ("s10", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
+    S11 = ("s11", [RegisterType.LOCAL, RegisterType.CALLEE_SAVED])
 
 
 DEC_RV64_IRCJumpType = {

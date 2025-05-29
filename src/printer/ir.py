@@ -57,11 +57,21 @@ class IRStringValue(IRValue):
 class IRStatement:
     label: Optional[str] = None
 
+    @property
+    def v_inputs(self) -> List[str]:
+        return []
+    @property
+    def v_outputs(self) -> List[str]:
+        return []
 
 @dataclass
 class IRStStoreValue(IRStatement):
     dest: str
     value: IRValue
+
+    @property
+    def v_outputs(self):
+        return [self.dest]
 
 
 class IRBOp(StrEnum):
@@ -89,6 +99,13 @@ class IRStBinOp(IRStatement):
     arg1: str
     arg2: str
 
+    @property
+    def v_inputs(self):
+        return [self.arg1, self.arg2]
+    @property
+    def v_outputs(self):
+        return [self.dest]
+
 
 class IRUOp(StrEnum):
     MINUS = auto()
@@ -101,6 +118,13 @@ class IRStUnOp(IRStatement):
     operation: IRUOp
     dest: str
     arg: str
+
+    @property
+    def v_inputs(self):
+        return [self.arg]
+    @property
+    def v_outputs(self):
+        return [self.dest]
 
 
 @dataclass
@@ -119,6 +143,10 @@ class IRStCJump(IRStatement):
     checked_var: str
     jump_to: str
 
+    @property
+    def v_inputs(self):
+        return [self.checked_var]
+
 
 @dataclass
 class IRStCall(IRStatement):
@@ -126,10 +154,21 @@ class IRStCall(IRStatement):
     arg_vars: List[str]
     assign_var: Optional[str] = None
 
+    @property
+    def v_inputs(self):
+        return self.arg_vars
+
+    @property
+    def v_outputs(self):
+        return [self.assign_var] if self.assign_var is not None else []
 
 @dataclass
 class IRStReturn(IRStatement):
     var: str
+
+    @property
+    def v_inputs(self):
+        return [self.var]
 
 
 """
