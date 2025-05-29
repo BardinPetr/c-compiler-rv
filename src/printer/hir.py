@@ -9,21 +9,24 @@ from printer.reg import Reg
 
 @dataclass
 class HVar:
-    name: str
+    pass
 
 @dataclass
 class HStackVar(HVar):
     pos: int = 0
     size: int = 8
+    name: str = ""
 
 @dataclass
 class HStackRegCopy(HStackVar):
     pos: int = 0
     reg: Reg = None
+    name: str = ""
 
 @dataclass
 class HRegVar(HVar):
     reg: Reg
+    name: str = ""
 
 @dataclass
 class HMemVar(HVar):

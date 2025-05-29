@@ -17,6 +17,6 @@ def run_qemu(asm_text: str) -> Optional[str]:
     )
     stderr = stderr.strip()
     if len(stderr) > 0:
-        print("£" * 5 + "stderr" + "£" * 5)
+        print("-" * 5 + " stderr " + "-" * 5)
         print(stderr)
     return stdout + stderr

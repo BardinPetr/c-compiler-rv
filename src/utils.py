@@ -3,8 +3,10 @@ import os
 import re
 import shlex
 import signal
+import string
 import subprocess
 from os.path import dirname, realpath
+from random import random, choices
 from typing import Optional, Tuple, List, Type
 
 
@@ -60,3 +62,6 @@ def class_hierarchy(x) -> List[Type]:
 
 def str_class_hierarchy(x) -> List[str]:
     return [i.__name__ for i in class_hierarchy(x)]
+
+def random_string(n: int) -> str:
+    return ''.join(choices(string.ascii_lowercase, k=n))

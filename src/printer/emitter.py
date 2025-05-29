@@ -21,16 +21,21 @@ class Emitter:
         return '\n'.join(self.data) + "\n"
 
 class BaseTransformer:
+    """
+    For each node gets class hierarchy and calls in sequence functions
+    named same as classnames from 'object' to most specific class
+    """
     def __call__(self, node):
         if isinstance(node, Iterable):
             for i in node:
                 self(i)
         else:
-            for node_name in str_class_hierarchy(node):
+            fired = False
+            for node_name in str_class_hierarchy(node)[::-1]:
                 if hasattr(self, node_name):
                     getattr(self, node_name)(node)
-                    break
-            else:
+                    fired = True
+            if not fired:
                 print(f"no transformer for node: \n{node}\n")
 
     def throw(self, *x):

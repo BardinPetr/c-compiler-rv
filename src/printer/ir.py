@@ -12,6 +12,7 @@ Data
 
 
 class IRType(StrEnum):
+    VOID = auto()
     INT = auto()
     CHAR = auto()
     STRING = auto()
@@ -123,6 +124,7 @@ class IRStCJump(IRStatement):
 class IRStCall(IRStatement):
     fun_name: str
     arg_vars: List[str]
+    assign_var: Optional[str] = None
 
 
 @dataclass
@@ -146,11 +148,12 @@ class IRFun:
     name: str
     ret_typ: IRType
     params: List[IRFunParam]
-    body: List[IRStatement]
+    body: Optional[List[IRStatement]] = None
     layout: Optional[HFunLayout] = None
 
     def __post_init__(self):
         self.exit_label = f"__exit_{self.name}"
+        self.is_impl = self.body is not None
 
 
 @dataclass

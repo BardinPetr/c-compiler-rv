@@ -4,7 +4,7 @@ from printer.emitter import Emitter, BaseTransformer
 from printer.hir import *
 from printer.hir import HRegVar
 from printer.ir import *
-from printer.opt import RVIRTransformer
+from printer.opt import RV64IR2HIRTransformer
 from printer.rv64 import DEC_RV64_IRCJumpType, RV64Reg, RV64_IRBOp_decoder
 from tests.qemu import run_qemu
 from utils import string_escape
@@ -13,14 +13,14 @@ from utils import string_escape
 @dataclass
 class Context:
     globals: Dict[str, HMemVar] = dataclasses.field(default_factory=dict)
+    functions: Dict[str, IRFun] = dataclasses.field(default_factory=dict)
     current_function: Optional[IRFun] = None
 
     @property
     def global_names(self) -> List[str]:
         return [*self.globals.keys(), ]
 
-
-class RVASMTransformer(BaseTransformer, Emitter):
+class RV64IR2ASMTransformer(BaseTransformer, Emitter):
     TYPE_DECODER_FOR_DECL = {
         IRType.INT: "quad",
         IRType.CHAR: "byte",
@@ -72,30 +72,34 @@ class RVASMTransformer(BaseTransformer, Emitter):
         if name in self.ctx.global_names:
             self.throw("name", name, "already exists")
 
-        self.emit_label(name)
-
         typ = self.TYPE_DECODER_FOR_DECL[glob.type]
         match glob:
             case IRGlobal(_, IRType.INT, IRIntValue(x) | x):
                 val = x if x is not None else 0
+                self.emit_label(name)
                 self.emit(f".{typ}", val)
 
             case IRGlobal(_, IRType.CHAR, IRCharValue(x) | x):
                 val = ord(x[0]) if x is not None else 0
+                self.emit_label(name)
                 self.emit(f".{typ}", val)
 
             case IRGlobal(_, IRType.STRING, IRStringValue(x)):
                 val = '"' + string_escape(x) + '"'
+                ptr = "__" + name
+                self.emit_label(ptr)
                 self.emit(f".{typ}", val)
+                self.emit_label(name)
+                self.emit(".dword", ptr)
 
             case _:
                 self.throw("invalid global", name)
                 return
 
-        self.ctx.globals[name] = HMemVar(name, name)
+        self.ctx.globals[name] = HMemVar(name)
 
     def IRFun(self, x: IRFun):
-        if x.body is None: return
+        if not x.is_impl: return
         m_layout = x.layout
 
         # PROLOGUE
@@ -107,6 +111,11 @@ class RVASMTransformer(BaseTransformer, Emitter):
         for slot in m_layout.stack:
             if isinstance(slot, HStackRegCopy):
                 self.emit("sd", slot.reg.code, f"{slot.pos}(sp)")
+        # save args
+        for param_reg, param in zip(self.regmap.params(), x.params):
+            param_slot = m_layout.mem_slots[param.name]
+            if isinstance(param_slot, HStackVar):
+                self.emit("sd", param_reg.code, f"{param_slot.pos}(sp)")
 
         # BODY
         self.ctx.current_function = x
@@ -143,9 +152,6 @@ class RVASMTransformer(BaseTransformer, Emitter):
         self.emit_section("text")
         self.emit(".global", "_start")
 
-        self.emit_label("halt")
-        self.emit("j", "halt")
-
         self.emit_label("_start")
         # assert single-core operation
         self.emit("csrr", "t0", "mhartid")
@@ -153,7 +159,11 @@ class RVASMTransformer(BaseTransformer, Emitter):
         self.emit("la", "sp", "stack_top")
         self.emit("j", "main")
 
+        self.ctx.functions = {i.name : i for i in x.functions}
         self(x.functions)
+
+        self.emit_label("halt")
+        self.emit("j", "halt")
 
     """
     Memory moves for abstract memory locations (HVar)
@@ -163,14 +173,14 @@ class RVASMTransformer(BaseTransformer, Emitter):
         match x:
             case HIRMove(HRegVar(src_reg), HRegVar(dst_reg)):
                 self.emit("addi", dst_reg.code, src_reg.code, 0)
-            case HIRMove(HRegVar(src_reg), HStackVar(_, dst_stk_pos, _)):
+            case HIRMove(HRegVar(src_reg), HStackVar(dst_stk_pos, _)):
                 self.emit("sd", src_reg.code, f"{dst_stk_pos}(sp)")
-            case HIRMove(HStackVar(_, src_stk_pos, _), HRegVar(dst_reg)):
+            case HIRMove(HStackVar(src_stk_pos, _), HRegVar(dst_reg)):
                 self.emit("ld", dst_reg.code, f"{src_stk_pos}(sp)")
-            case HIRMove(HRegVar(src_reg), HMemVar(_, dst_mem_lbl)):
+            case HIRMove(HRegVar(src_reg), HMemVar(dst_mem_lbl)):
                 self.emit("la", "t0", dst_mem_lbl)
                 self.emit("sd", src_reg.code, "0(t0)")
-            case HIRMove(HMemVar(_, src_mem_lbl), HRegVar(dst_reg)):
+            case HIRMove(HMemVar(src_mem_lbl), HRegVar(dst_reg)):
                 self.emit("la", "t0", src_mem_lbl)
                 self.emit("ld", dst_reg.code, "0(t0)")
             case _:
@@ -180,25 +190,37 @@ class RVASMTransformer(BaseTransformer, Emitter):
     Statements
     """
 
+    def IRStatement(self, x: IRStatement):
+        # before each statement, emit label if exists
+        if x.label is not None:
+            self.emit_label(x.label)
+
     def IRStReturn(self, x: IRStReturn):
         original_ret_var = self.fun.layout.mem_slots.get(x.var, None)
         if original_ret_var is None:
             self.throw("not existing var", x.var)
         # меняем псевдо-возврат IR на запись возвращаемого значения из "переменной" в A0 и переход к эпилогу
         self([
-            HIRMove(src=original_ret_var, dst=HRegVar("", reg=self.regmap.ret()[0])),
+            HIRMove(src=original_ret_var, dst=HRegVar(self.regmap.ret()[0])),
             IRStJump(target=self.fun.exit_label)
         ])
 
     def IRStCall(self, x: IRStCall):
+        fun = self.ctx.functions.get(x.fun_name, None)
+        if fun is None:
+            self.throw("not existing function", x.fun_name)
+        if len(fun.params) != len(x.arg_vars):
+            self.throw("args invalid for function", x.fun_name)
         self([
-            HIRMove(src=self.slot(src_var), dst=HRegVar("", reg=param_reg))
+            HIRMove(src=self.slot(src_var), dst=HRegVar(param_reg))
             for param_reg, src_var in zip(self.regmap.params(), x.arg_vars)
         ]) # пишем из переменных в регистры по calling conv
         self.emit("call", x.fun_name)
+        if x.assign_var is not None:
+            self([HIRMove(src=HRegVar(RV64Reg.ret()[0]), dst=self.slot(x.assign_var))])
 
     def IRStJump(self, x: IRStJump):
-        self.emit("j", x.label)
+        self.emit("j", x.target)
 
     def IRStCJump(self, x: IRStCJump):
         self.emit(
@@ -248,21 +270,24 @@ class RVASMTransformer(BaseTransformer, Emitter):
 
     def IRStStoreValue(self, x: IRStStoreValue):
         match x.value:
-            case IRIntValue(ival) | IRCharValue(ival):
+            case IRIntValue(ival):
                 self.emit("li", "t0", ival)
+            case IRCharValue(csval):
+                self.emit("li", "t0", ord(csval[0]))
             case IRStringValue(label):
-                self.emit("la", "t0", label)
+                self(HIRMove(src=HMemVar(label), dst=self.slot(x.dest)))
+                return
         self(HIRMove(
-            src=HRegVar("", reg=self.regmap.T0),
+            src=HRegVar(reg=self.regmap.T0),
             dst=self.slot(x.dest)
         ))
 
 
 def do_asm(ir: IRProg):
-    opt = RVIRTransformer(RV64Reg)
+    opt = RV64IR2HIRTransformer(RV64Reg)
     ir = opt(ir)
 
-    trf = RVASMTransformer()
+    trf = RV64IR2ASMTransformer()
     trf(ir)
 
     return trf.get()
@@ -271,22 +296,48 @@ def do_asm(ir: IRProg):
 res = do_asm(
     IRProg(
         functions=[
+            IRFun("puts", IRType.VOID, [IRFunParam("s", IRType.STRING)]),
+            IRFun("putc", IRType.VOID, [IRFunParam("c", IRType.CHAR)]),
+            IRFun("demo", IRType.INT, [IRFunParam("par", IRType.INT)], [
+                IRStStoreValue("d", IRIntValue(48)),
+                # IRStBinOp(IRBOp.ADD, "d", "d", "par"),
+                IRStReturn("d")
+            ]),
             IRFun(
-                "fun1",
+                "main",
                 IRType.INT,
                 [IRFunParam("par_i", IRType.INT), IRFunParam("par_j", IRType.CHAR), IRFunParam("par_s", IRType.STRING)],
                 [
+                    IRStCall("puts", ["gvar_str"], label="l1"),
 
-                    # IRStReturn("test")
+                    IRStStoreValue("d", IRCharValue("%")),
+                    IRStCall("putc", ["d"]),
+
+                    IRStStoreValue("d", IRStringValue("\n\n\n-----HELLOW!\n\n -> ")),
+                    IRStCall("puts", ["d"]),
+
+                    # IRStJump("l1"),
+
+                    IRStStoreValue("a", IRIntValue(2)),
+                    IRStCall("demo", ["a"], assign_var="a"),
+                    IRStStoreValue("b", IRIntValue(2)),
+                    IRStStoreValue("c", IRIntValue(4)),
+                    IRStBinOp(IRBOp.ADD, "d", "a", "c"),
+                    IRStCall("putc", ["d"]),
+                    IRStBinOp(IRBOp.SUB, "d", "d", "b"),
+                    IRStCall("putc", ["d"]),
+
+                    # IRStCall("test", ["a", "par_i", "c"]),
+                    IRStReturn("par_j")
                 ]
             )
         ],
         globals=[
             # IRGlobal("gvar_nd_int", IRType.INT),
-            # IRGlobal("gvar_int", IRType.INT, IRIntValue(1111)),
+            IRGlobal("gvar_int", IRType.INT, IRIntValue(48)),
             # IRGlobal("gvar_nd_char", IRType.CHAR),
             # IRGlobal("gvar_char", IRType.CHAR, IRCharValue('\n')),
-            # IRGlobal("gvar_str", IRType.STRING, IRStringValue("hellow\torld\n\t\t!!!!")),
+            IRGlobal("gvar_str", IRType.STRING, IRStringValue("hellow\torld\n\t\t!!!!")),
         ]
     )
 )
