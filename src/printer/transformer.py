@@ -7,7 +7,7 @@ from printer.ir import *
 from printer.opt import RV64IR2HIRTransformer
 from printer.rv64 import DEC_RV64_IRCJumpType, RV64Reg, RV64_IRBOp_decoder
 from tests.qemu import run_qemu
-from utils import string_escape
+from utils import string_escape, random_string
 
 
 @dataclass
@@ -86,7 +86,7 @@ class RV64IR2ASMTransformer(BaseTransformer, Emitter):
 
             case IRGlobal(_, IRType.STRING, IRStringValue(x)):
                 val = '"' + string_escape(x) + '"'
-                ptr = "__" + name
+                ptr = random_string(16)
                 self.emit_label(ptr)
                 self.emit(f".{typ}", val)
                 self.emit_label(name)
@@ -226,7 +226,7 @@ class RV64IR2ASMTransformer(BaseTransformer, Emitter):
         self.emit(
             DEC_RV64_IRCJumpType[x.check_type],
             self.rvar(x.checked_var),
-            x.label
+            x.jump_to
         )
 
     def emit_reg_op(self, op, *args):
@@ -258,6 +258,8 @@ class RV64IR2ASMTransformer(BaseTransformer, Emitter):
 
     def IRStUnOp(self, x: IRStUnOp):
         match x.operation:
+            case IRUOp.COPY:
+                self.emit_reg_op("mv", x.dest, x.arg)
             case IRUOp.MINUS:
                 self.emit_reg_op("neg", x.dest, x.arg)
             case IRUOp.BIT_NEG:
@@ -298,27 +300,56 @@ res = do_asm(
         functions=[
             IRFun("puts", IRType.VOID, [IRFunParam("s", IRType.STRING)]),
             IRFun("putc", IRType.VOID, [IRFunParam("c", IRType.CHAR)]),
+            IRFun("putd", IRType.VOID, [IRFunParam("d", IRType.INT)]),
             IRFun("demo", IRType.INT, [IRFunParam("par", IRType.INT)], [
-                IRStStoreValue("d", IRIntValue(48)),
-                # IRStBinOp(IRBOp.ADD, "d", "d", "par"),
+                IRStStoreValue("d", IRIntValue(0)),
+                IRStBinOp(IRBOp.ADD, "d", "chr_zero", "par"),
                 IRStReturn("d")
             ]),
             IRFun(
                 "main",
                 IRType.INT,
-                [IRFunParam("par_i", IRType.INT), IRFunParam("par_j", IRType.CHAR), IRFunParam("par_s", IRType.STRING)],
+                [IRFunParam("par_i", IRType.INT)],
                 [
+                    IRStStoreValue("cnt", IRIntValue(5)),
+                    IRStStoreValue("i", IRIntValue(0)),
+                    IRStStoreValue("1", IRIntValue(1)),
+                    IRStStoreValue("c1", IRCharValue("@")),
+                    IRStStoreValue("c2", IRCharValue("$")),
+                    IRStStoreValue("c3", IRCharValue("%")),
+                    IRStUnOp(IRUOp.COPY, "nl", "chr_nl"),
+                    IRStCall("putc", ["c1"], label="loopstart"),
+                    IRStBinOp(IRBOp.SUB, "chkv", "cnt", "i"),
+                    IRStCall("putd", ["chkv"]),
+                    IRStCall("putc", ["c2"]),
+                    IRStCJump(IRCJumpType.JZ, "chkv", "loopend"),
+                    IRStCall("putc", ["c3"]),
+                    IRStBinOp(IRBOp.ADD, "i", "i", "1"),
+                    IRStCall("putc", ["nl"]),
+                    IRStJump("loopstart"),
+                    IRStatement(label="loopend"),
+
+                    IRStCall("putc", ["nl"]),
+
                     IRStCall("puts", ["gvar_str"], label="l1"),
 
                     IRStStoreValue("d", IRCharValue("%")),
                     IRStCall("putc", ["d"]),
 
-                    IRStStoreValue("d", IRStringValue("\n\n\n-----HELLOW!\n\n -> ")),
+                    IRStCall("putc", ["nl"]),
+                    IRStCall("putd", ["chr_zero"]),
+                    IRStCall("putc", ["nl"]),
+                    IRStStoreValue("v2", IRIntValue(24)),
+                    IRStStoreValue("v3", IRIntValue(47)),
+                    IRStBinOp(IRBOp.MUL, "chr_zero", "chr_zero", "v2"),
+                    IRStBinOp(IRBOp.DIV, "chr_zero", "chr_zero", "v3"), # 94 * 24 / 47 = 48 = '0'
+                    IRStCall("putd", ["chr_zero"]),
+                    IRStCall("putc", ["nl"]),
+
+                    IRStStoreValue("d", IRStringValue("-----HELLOW!\n\n -> ")),
                     IRStCall("puts", ["d"]),
 
-                    # IRStJump("l1"),
-
-                    IRStStoreValue("a", IRIntValue(2)),
+                    IRStStoreValue("a", IRIntValue(8)),
                     IRStCall("demo", ["a"], assign_var="a"),
                     IRStStoreValue("b", IRIntValue(2)),
                     IRStStoreValue("c", IRIntValue(4)),
@@ -327,16 +358,13 @@ res = do_asm(
                     IRStBinOp(IRBOp.SUB, "d", "d", "b"),
                     IRStCall("putc", ["d"]),
 
-                    # IRStCall("test", ["a", "par_i", "c"]),
-                    IRStReturn("par_j")
+                    IRStReturn("par_i")
                 ]
             )
         ],
         globals=[
-            # IRGlobal("gvar_nd_int", IRType.INT),
-            IRGlobal("gvar_int", IRType.INT, IRIntValue(48)),
-            # IRGlobal("gvar_nd_char", IRType.CHAR),
-            # IRGlobal("gvar_char", IRType.CHAR, IRCharValue('\n')),
+            IRGlobal("chr_zero", IRType.INT, IRIntValue(94)),
+            IRGlobal("chr_nl", IRType.CHAR, IRCharValue('\n')),
             IRGlobal("gvar_str", IRType.STRING, IRStringValue("hellow\torld\n\t\t!!!!")),
         ]
     )

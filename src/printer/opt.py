@@ -4,25 +4,6 @@ from printer.rv64 import RV64Reg
 from utils import random_string
 
 
-def detect_locals(fun: IRFun) -> Dict[str, Tuple[int, int]]:
-    """
-    найти используемые переменные, заодно оценить частоту использования
-    :return (r, w)
-    """
-    if not fun.is_impl: return {}
-
-    result = {}
-    for i in fun.body:
-        if isinstance(i, IRStatement):
-            for v in i.v_inputs:
-                if v not in result: result[v] = [0, 0]
-                result[v][0] += 1
-            for v in i.v_outputs:
-                if v not in result: result[v] = [0, 0]
-                result[v][1] += 1
-    return result
-
-
 class RV64IR2HIRTransformer:
     def __init__(self, regmap: Type[Reg]):
         self.regmap = regmap
@@ -78,15 +59,35 @@ class RV64IR2HIRTransformer:
         вставить адаптеры когда надо чтобы переменная оказалась в регистре (и наоборот),
         а ее внезапно аллоцировали не в регистр, а в память (стек)
         """
+        if not fun.is_impl: return fun
         res = []
         for i in fun.body:
-            for v_i in i.v_inputs:
-                pass
+            allowed_regs = self.regmap.one_time()
+            in_repl, out_repl = {}, {}
+            in_mov, out_mov = [], []
+            for typ, arr in [('in', i.v_inputs), ('out', i.v_outputs)]:
+                for v_name in arr:
+                    v_orig = fun.layout.mem_slots[v_name]
+                    if not isinstance(v_orig, HRegVar):
+                        v_tmp_name = random_string(4)
+                        v_tmp_reg = allowed_regs.pop()
+                        v_tmp = HRegVar(v_tmp_reg, name=v_name)
 
-            res.append(i)
+                        fun.layout.mem_slots[v_tmp_name] = v_tmp
+                        if typ == 'in':
+                            in_repl[v_name] = v_tmp_name
+                            in_mov.append((v_orig, v_tmp))
+                        else:
+                            out_repl[v_name] = v_tmp_name
+                            out_mov.append((v_tmp, v_orig))
 
-            for v_o in i.v_outputs:
-                pass
+            for src, dst in in_mov:
+                res.append(HIRMove(src, dst))
+
+            res.append(statement_substitute_vars(i, in_repl, out_repl))
+
+            for src, dst in out_mov:
+                res.append(HIRMove(src, dst))
 
         fun.body = res
         return fun
@@ -130,3 +131,43 @@ class RV64IR2HIRTransformer:
         fun = self.fun_prepare_stack(fun)
         fun = self.fun_add_var_moves(fun)
         return fun
+
+
+def detect_locals(fun: IRFun) -> Dict[str, Tuple[int, int]]:
+    """
+    найти используемые переменные, заодно оценить частоту использования
+    :return (r, w)
+    """
+    if not fun.is_impl: return {}
+
+    result = {}
+    for i in fun.body:
+        if isinstance(i, IRStatement):
+            for v in i.v_inputs:
+                if v not in result: result[v] = [0, 0]
+                result[v][0] += 1
+            for v in i.v_outputs:
+                if v not in result: result[v] = [0, 0]
+                result[v][1] += 1
+    return result
+
+
+def statement_substitute_vars(x: IRStatement, irepl: Dict[str, str], orepl: Dict[str, str]) -> IRStatement:
+    match x:
+        case IRStStoreValue(dest, _):
+            x.dest = orepl.get(dest, dest)
+        case IRStBinOp(_, dest, arg1, arg2):
+            x.dest = orepl.get(dest, dest)
+            x.arg1 = irepl.get(arg1, arg1)
+            x.arg2 = irepl.get(arg2, arg2)
+        case IRStUnOp(_, dest, arg):
+            x.dest = orepl.get(dest, dest)
+            x.arg = irepl.get(arg, arg)
+        case IRStCJump(_, checked_var, _):
+            x.checked_var = irepl.get(checked_var, checked_var)
+        case IRStReturn(var):
+            x.var = irepl.get(var, var)
+        case IRStCall(_, arg_vars, assign_var):
+            x.arg_vars = [irepl.get(i, i) for i in arg_vars]
+            x.assign_var = orepl.get(assign_var, assign_var)
+    return x

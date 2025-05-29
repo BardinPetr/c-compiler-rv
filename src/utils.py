@@ -27,7 +27,7 @@ def run_command(
             env=process_env,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            # text=True,
             start_new_session=True
         )
         try:
@@ -35,8 +35,8 @@ def run_command(
         except subprocess.TimeoutExpired:
             os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
 
-        stdout = proc.stdout.read()
-        stderr = proc.stderr.read()
+        stdout = proc.stdout.read().decode("utf-8", errors="replace")
+        stderr = proc.stderr.read().decode("utf-8", errors="replace")
         stderr = re.sub(r"qemu-system-riscv64.*\n", "", stderr)
         return proc.returncode == 0, stdout, stderr
 

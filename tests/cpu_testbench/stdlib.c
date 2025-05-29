@@ -13,3 +13,20 @@ void putc(char c) {
 void puts(const char *str) {
     while (*str) putc(*str++);
 }
+
+void print_negative(int n) {
+    if (n <= -10) {
+        print_negative(n / 10);
+    }
+    putc('0' - (n % 10));
+}
+
+void putd(int n) {
+    if (n < 0) {
+        putc('-');
+    }
+    if (n > 0) {
+        n = -n;
+    }
+    print_negative(n);
+}

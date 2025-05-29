@@ -111,6 +111,7 @@ class IRUOp(StrEnum):
     MINUS = auto()
     BIT_NEG = auto()
     LOG_NEG = auto()
+    COPY = auto()
 
 
 @dataclass
