@@ -1,3 +1,5 @@
+import pprint
+
 import pytest
 from pytest_golden.plugin import GoldenTestFixture
 
@@ -13,8 +15,8 @@ def test_golden(golden: GoldenTestFixture):
         assert tree.pretty() == golden.out['parse_tree'], "Parse tree mismatch"
 
     if 'ast' in test_level:
-        ast = do_ast(tree)
-        assert str(ast) == golden.out['ast_tree'], "AST mismatch"
+        ast = pprint.pformat(do_ast(tree), width=20)
+        assert ast == golden.out['ast_tree'], "AST mismatch"
 
     # if 'asm' in test_level:
     #     asm = do_asm(ast)

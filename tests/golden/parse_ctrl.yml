@@ -17,112 +17,76 @@ parse_tree: |
       decl_fun_sig
         void
         main
+        decl_fun_sig_params
       block
-        statements
-          statement
-            decl_var
-              var_sig
-                int
-                a
-              None
-          statement
-            decl_var
-              var_sig
-                int
-                a
-              expression
-                literal
-                  lit_int	12
-          statement
-            decl_var
-              var_sig
-                char
-                a
-              expression
-                literal
-                  lit_char	a
-          statement
-            decl_var
-              var_sig
-                int
-                a
-              expression
-                literal
-                  lit_string
-                    a
-                    s
-                    d
-                    a
-                    s
-                    d
-                    \n
-                    \\
-                    \"
-          statement
-            decl_var
-              var_sig
-                int
-                b
-              expression
+        st_var_decl
+          var_sig
+            int
+            a
+        st_var_decl
+          var_sig
+            int
+            a
+          ex_lit
+            lit_int	12
+        st_var_decl
+          var_sig
+            char
+            a
+          ex_lit
+            lit_char	a
+        st_var_decl
+          var_sig
+            int
+            a
+          ex_lit
+            lit_string	asdasd\n\\\"
+        st_var_decl
+          var_sig
+            int
+            b
+          ex_binary
+            ex_rd_var	a
+            +
+            ex_binary
+              ex_binary
+                ex_rd_var	a
+                *
                 ex_binary
-                  expression	a
-                  +
-                  expression
-                    expression
-                      ex_binary
-                        expression
-                          ex_binary
-                            expression	a
-                            *
-                            expression
-                              expression
-                                ex_binary
-                                  expression	b
-                                  /
-                                  expression	c
-                        &
-                        expression	d
-          statement
-            decl_var
-              var_sig
-                int
-                c
-              expression
-                ex_binary
-                  expression	a
-                  +
-                  expression
-                    expression
-                      ex_prefix
-                        -
-                        expression
-                          ex_binary
-                            expression	a
-                            *
-                            expression
-                              literal
-                                lit_int	-3
-          statement
-            decl_var
-              var_sig
-                int
-                d
-              expression
-                ex_binary
-                  expression
-                    ex_call
-                      b
-                      expression
-                        literal
-                          lit_int	1
-                      expression
-                        literal
-                          lit_char	a
-                  +
-                  expression
-                    ex_call	c
-          statement
-            expression
-              ex_postfix
-                expression	d
-                ++
+                  ex_rd_var	b
+                  /
+                  ex_rd_var	c
+              &
+              ex_rd_var	d
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_binary
+            ex_rd_var	a
+            +
+            ex_binary
+              ex_uop
+                ex_prefix
+                  -
+                  ex_rd_var	a
+              *
+              ex_lit
+                lit_int	-3
+        st_var_decl
+          var_sig
+            int
+            d
+          ex_binary
+            ex_call
+              b
+              ex_lit
+                lit_int	1
+              ex_lit
+                lit_char	a
+            +
+            ex_call	c
+        ex_uop
+          ex_postfix
+            ex_rd_var	d
+            ++

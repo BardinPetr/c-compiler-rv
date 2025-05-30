@@ -5,15 +5,15 @@ text: |-
   string global_s = "hello!\n";
   int gi;
   char gc;
-  
+
   void putc(char c);
   void puts(string s);
   void puti(int i);
-  
+
   void f() {
       return;
   }
-  
+
   void g() {
          if (0) int a;
          if (0) {
@@ -26,13 +26,13 @@ text: |-
               int b;
          }
          while(1) {
-  
+
          }
-  
+
           int a;
           int b = 0;
           int c = b;
-  
+
           break;
           continue;
           return;
@@ -41,20 +41,20 @@ text: |-
       1;
       a(1, a, 2);
       1 ? 2 : 3;
-  
+
       -1;
       -a;
       !a;
       // a++;
       a--;
-  
+
       1 + (N * 3);
-  
+
       1 < (4 * 5) ? f() + 3-- : 5++;
-  
+
   }
-  
-  
+
+
   int g(int a, char b) {
       int c = 0;
       c = c + a;
@@ -62,7 +62,7 @@ text: |-
       int d = a + b + c;
       return d % 10;
   }
-  
+
   int h(int x) {
       if (x == 0) {
           return 1;
@@ -74,7 +74,7 @@ text: |-
       }
       return b;
   }
-  
+
   int j() {
       int c = 0;
       /*
@@ -85,70 +85,423 @@ text: |-
           puts("\n->");
       }
   }
-  
+
   void main() {
       j();
   }
 
-ast_tree: Tree(Token('RULE', 'start'), [Tree(Token('RULE', 'decl_fun'), [Tree(Token('RULE',
-  'decl_fun_sig'), [Token('TYP', 'void'), Token('CNAME', 'main')]), Tree(Token('RULE',
-  'block'), [Tree(Token('RULE', 'statements'), [Tree(Token('RULE', 'statement'), [Tree(Token('RULE',
-  'decl_var'), [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME',
-  'a')]), None])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'),
-  [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME', 'b')]), Tree(Token('RULE',
-  'expression'), [Tree(Token('RULE', 'literal'), [Tree(Token('RULE', 'lit_int'), [12])])])])]),
-  Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'), [Tree(Token('RULE',
-  'var_sig'), [Token('TYP', 'char'), Token('CNAME', 'c')]), Tree(Token('RULE', 'expression'),
-  [Tree(Token('RULE', 'literal'), [Tree(Token('RULE', 'lit_char'), ['a'])])])])]),
-  Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'), [Tree(Token('RULE',
-  'var_sig'), [Token('TYP', 'int'), Token('CNAME', 's')]), Tree(Token('RULE', 'expression'),
-  [Tree(Token('RULE', 'literal'), [Tree(Token('RULE', 'lit_string'), ['a', 's', 'd',
-  '\n', '\t', '\\', '"', 'd', 's', 'a'])])])])])])])])])
+ast_tree: |-
+  Prog(globals=[DeclStaticVar(sig=Var<global_i:DT<int>>,
+                              init=LitInt(value=0)),
+                DeclStaticVar(sig=Var<global_c:DT<char>>,
+                              init=LitChar(value='t')),
+                DeclStaticVar(sig=Var<global_s:DT<string>>,
+                              init=LitString(value='hello!\n')),
+                DeclStaticVar(sig=Var<gi:DT<int>>,
+                              init=None),
+                DeclStaticVar(sig=Var<gc:DT<char>>,
+                              init=None)],
+       functions={'f': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                              name='f',
+                                              args=[]),
+                               body=[StReturn(value=None)]),
+                  'g': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                              name='g',
+                                              args=[Var<a:DT<int>>,
+                                                    Var<b:DT<char>>]),
+                               body=[StVarDecl(sig=Var<c:DT<int>>,
+                                               init=ExLit(value=LitInt(value=0))),
+                                     StAsn(dst='c',
+                                           expr=ExBinary(exp1=ExRdVar(name='c'),
+                                                         cmd=Token('BOP', '+'),
+                                                         exp2=ExRdVar(name='a'))),
+                                     StAsn(dst='b',
+                                           expr=ExBinary(exp1=ExRdVar(name='a'),
+                                                         cmd=Token('BOP', '*'),
+                                                         exp2=ExRdVar(name='c'))),
+                                     StVarDecl(sig=Var<d:DT<int>>,
+                                               init=ExBinary(exp1=ExBinary(exp1=ExRdVar(name='a'),
+                                                                           cmd=Token('BOP', '+'),
+                                                                           exp2=ExRdVar(name='b')),
+                                                             cmd=Token('BOP', '+'),
+                                                             exp2=ExRdVar(name='c'))),
+                                     StReturn(value=ExBinary(exp1=ExRdVar(name='d'),
+                                                             cmd=Token('BOP', '%'),
+                                                             exp2=ExLit(value=LitInt(value=10))))]),
+                  'h': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                              name='h',
+                                              args=[Var<x:DT<int>>]),
+                               body=[StIf(check_expr=ExBinary(exp1=ExRdVar(name='x'),
+                                                              cmd=Token('BOP', '=='),
+                                                              exp2=ExLit(value=LitInt(value=0))),
+                                          br_true=[StReturn(value=ExLit(value=LitInt(value=1)))],
+                                          br_false=None),
+                                     StVarDecl(sig=Var<b:DT<int>>,
+                                               init=ExLit(value=LitInt(value=-1))),
+                                     StIf(check_expr=ExBinary(exp1=ExBinary(exp1=ExRdVar(name='x'),
+                                                                            cmd=Token('BOP', '*'),
+                                                                            exp2=ExLit(value=LitInt(value=5))),
+                                                              cmd=Token('BOP', '<'),
+                                                              exp2=ExLit(value=LitInt(value=10))),
+                                          br_true=[StAsn(dst='b',
+                                                         expr=ExLit(value=LitInt(value=10))),
+                                                   StAsn(dst='b',
+                                                         expr=ExBinary(exp1=ExRdVar(name='b'),
+                                                                       cmd=Token('BOP', '*'),
+                                                                       exp2=ExRdVar(name='x')))],
+                                          br_false=None),
+                                     StReturn(value=ExRdVar(name='b'))]),
+                  'j': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                              name='j',
+                                              args=[]),
+                               body=[StVarDecl(sig=Var<c:DT<int>>,
+                                               init=ExLit(value=LitInt(value=0))),
+                                     StWhile(check_expr=ExBinary(exp1=ExUnary(cmd=U<uop_inc>,
+                                                                              value=ExRdVar(name='c')),
+                                                                 cmd=Token('BOP', '<'),
+                                                                 exp2=ExLit(value=LitInt(value=10))),
+                                             body=[ExCall(name='puti',
+                                                          args=(ExRdVar(name='c'),)),
+                                                   ExCall(name='puts',
+                                                          args=(ExLit(value=LitString(value='\n'
+                                                                                            '->')),))])]),
+                  'main': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='main',
+                                                 args=[]),
+                                  body=[ExCall(name='j',
+                                               args=())]),
+                  'putc': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='putc',
+                                                 args=[Var<c:DT<char>>]),
+                                  body=None),
+                  'puti': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='puti',
+                                                 args=[Var<i:DT<int>>]),
+                                  body=None),
+                  'puts': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='puts',
+                                                 args=[Var<s:DT<string>>]),
+                                  body=None)})
 parse_tree: |
   start
+    decl_static_var
+      var_sig
+        int
+        global_i
+      lit_int	0
+    decl_static_var
+      var_sig
+        char
+        global_c
+      lit_char	t
+    decl_static_var
+      var_sig
+        string
+        global_s
+      lit_string	hello!\n
+    decl_static_var
+      var_sig
+        int
+        gi
+    decl_static_var
+      var_sig
+        char
+        gc
+    decl_fun_sig
+      void
+      putc
+      decl_fun_sig_params
+        var_sig
+          char
+          c
+    decl_fun_sig
+      void
+      puts
+      decl_fun_sig_params
+        var_sig
+          string
+          s
+    decl_fun_sig
+      void
+      puti
+      decl_fun_sig_params
+        var_sig
+          int
+          i
+    decl_fun
+      decl_fun_sig
+        void
+        f
+        decl_fun_sig_params
+      block
+        st_return
+    decl_fun
+      decl_fun_sig
+        void
+        g
+        decl_fun_sig_params
+      block
+        st_if
+          ex_lit
+            lit_int	0
+          block_or_line
+            st_var_decl
+              var_sig
+                int
+                a
+          None
+        st_if
+          ex_lit
+            lit_int	0
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  a
+          None
+        st_if
+          ex_lit
+            lit_int	0
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  a
+              st_var_decl
+                var_sig
+                  int
+                  b
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  b
+        st_while
+          ex_lit
+            lit_int	1
+          block_or_line
+            block
+        st_var_decl
+          var_sig
+            int
+            a
+        st_var_decl
+          var_sig
+            int
+            b
+          ex_lit
+            lit_int	0
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_rd_var	b
+        break
+        continue
+        st_return
+        st_return
+          ex_lit
+            lit_int	1
+        ex_rd_var	a
+        ex_lit
+          lit_int	1
+        ex_call
+          a
+          ex_lit
+            lit_int	1
+          ex_rd_var	a
+          ex_lit
+            lit_int	2
+        ex_conditional
+          ex_lit
+            lit_int	1
+          ex_lit
+            lit_int	2
+          ex_lit
+            lit_int	3
+        ex_lit
+          lit_int	-1
+        ex_uop
+          ex_prefix
+            -
+            ex_rd_var	a
+        ex_uop
+          ex_prefix
+            !
+            ex_rd_var	a
+        ex_uop
+          ex_postfix
+            ex_rd_var	a
+            --
+        ex_binary
+          ex_lit
+            lit_int	1
+          +
+          ex_binary
+            ex_rd_var	N
+            *
+            ex_lit
+              lit_int	3
+        ex_conditional
+          ex_binary
+            ex_lit
+              lit_int	1
+            <
+            ex_binary
+              ex_lit
+                lit_int	4
+              *
+              ex_lit
+                lit_int	5
+          ex_binary
+            ex_call	f
+            +
+            ex_uop
+              ex_postfix
+                ex_lit
+                  lit_int	3
+                --
+          ex_uop
+            ex_postfix
+              ex_lit
+                lit_int	5
+              ++
+    decl_fun
+      decl_fun_sig
+        int
+        g
+        decl_fun_sig_params
+          var_sig
+            int
+            a
+          var_sig
+            char
+            b
+      block
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_lit
+            lit_int	0
+        st_asn
+          c
+          ex_binary
+            ex_rd_var	c
+            +
+            ex_rd_var	a
+        st_asn
+          b
+          ex_binary
+            ex_rd_var	a
+            *
+            ex_rd_var	c
+        st_var_decl
+          var_sig
+            int
+            d
+          ex_binary
+            ex_binary
+              ex_rd_var	a
+              +
+              ex_rd_var	b
+            +
+            ex_rd_var	c
+        st_return
+          ex_binary
+            ex_rd_var	d
+            %
+            ex_lit
+              lit_int	10
+    decl_fun
+      decl_fun_sig
+        int
+        h
+        decl_fun_sig_params
+          var_sig
+            int
+            x
+      block
+        st_if
+          ex_binary
+            ex_rd_var	x
+            ==
+            ex_lit
+              lit_int	0
+          block_or_line
+            block
+              st_return
+                ex_lit
+                  lit_int	1
+          None
+        st_var_decl
+          var_sig
+            int
+            b
+          ex_lit
+            lit_int	-1
+        st_if
+          ex_binary
+            ex_binary
+              ex_rd_var	x
+              *
+              ex_lit
+                lit_int	5
+            <
+            ex_lit
+              lit_int	10
+          block_or_line
+            block
+              st_asn
+                b
+                ex_lit
+                  lit_int	10
+              st_asn
+                b
+                ex_binary
+                  ex_rd_var	b
+                  *
+                  ex_rd_var	x
+          None
+        st_return
+          ex_rd_var	b
+    decl_fun
+      decl_fun_sig
+        int
+        j
+        decl_fun_sig_params
+      block
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_lit
+            lit_int	0
+        st_while
+          ex_binary
+            ex_uop
+              ex_postfix
+                ex_rd_var	c
+                ++
+            <
+            ex_lit
+              lit_int	10
+          block_or_line
+            block
+              ex_call
+                puti
+                ex_rd_var	c
+              ex_call
+                puts
+                ex_lit
+                  lit_string	\n->
     decl_fun
       decl_fun_sig
         void
         main
+        decl_fun_sig_params
       block
-        statements
-          statement
-            decl_var
-              var_sig
-                int
-                a
-              None
-          statement
-            decl_var
-              var_sig
-                int
-                b
-              expression
-                literal
-                  lit_int	12
-          statement
-            decl_var
-              var_sig
-                char
-                c
-              expression
-                literal
-                  lit_char	a
-          statement
-            decl_var
-              var_sig
-                int
-                s
-              expression
-                literal
-                  lit_string
-                    a
-                    s
-                    d
-                    \n
-                    \t
-                    \\
-                    \"
-                    d
-                    s
-                    a
+        ex_call	j
