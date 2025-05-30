@@ -15,13 +15,15 @@ _decl_global: decl_fun_sig ";"
              | decl_var ";"
              | decl_fun
 
-decl_fun: decl_fun_sig block
-
-decl_fun_sig: TYP CNAME _paren{_sep0{var_sig}}
-
 var_sig: TYP CNAME
 
-decl_var: var_sig ["=" expression]
+decl_fun: decl_fun_sig block
+
+decl_fun_sig: TYP CNAME decl_fun_sig_params
+
+decl_fun_sig_params: _paren{_sep0{var_sig}}
+
+decl_var: var_sig ["=" _literal]
 
 
 // statements
@@ -54,24 +56,29 @@ ex_call: CNAME _paren{_sep0{expression}}
 
 ex_binary: expression BOP expression
 
+ex_conditional: expression "?" expression ":" expression
+
+ex_rdvar: CNAME
+
 expression: _paren{expression}
-          | CNAME
-          | literal
+          | _literal
+          | ex_rdvar
           | ex_prefix
           | ex_postfix
           | ex_call
           | ex_binary
+          | ex_conditional
 
 
 // literals
 
-literal: lit_int
+_literal: lit_int
        | lit_char
        | lit_string
 
 lit_int: SIG_INTEGER
 lit_char: "'" STRING_CHAR "'"
-lit_string: "\"" STRING_CHAR* "\""
+lit_string: "\"" STRING "\""
 
 
 // terminals
@@ -117,9 +124,10 @@ KW_BREAK: "break"
 KW_RETURN: "return"
 KW_SIZEOF: "sizeof"
 
-TYP: TYP_CHAR | TYP_INT | TYP_VOID
+TYP: TYP_CHAR | TYP_INT | TYP_STRING | TYP_VOID
 TYP_INT: "int"
 TYP_CHAR: "char"
+TYP_STRING: "string"
 TYP_VOID: "void"
 
 LETTER: "a".."z" | "A".."Z"
@@ -129,6 +137,7 @@ DIGIT: "0".."9"
 INTEGER: DIGIT+
 SIG_INTEGER: ["+"|"-"] INTEGER
 STRING_CHAR: /[^"\\]|\\[nt"\\]/
+STRING: STRING_CHAR+
 
 WS: /[ \t\r\n]/+
 COMMENT: /\/\/[^\n]*/

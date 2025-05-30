@@ -13,11 +13,14 @@ ast_tree: Tree(Token('RULE', 'start'), [Tree(Token('RULE', 'decl_fun'), [Tree(To
   'decl_var'), [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME',
   'a')]), None])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'),
   [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME', 'b')]), Tree(Token('RULE',
-  'expression'), [12])])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'),
-  [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'char'), Token('CNAME', 'c')]), Tree(Token('RULE',
-  'expression'), ['a'])])]), Tree(Token('RULE', 'statement'), [Tree(Token('RULE',
-  'decl_var'), [Tree(Token('RULE', 'var_sig'), [Token('TYP', 'int'), Token('CNAME',
-  's')]), Tree(Token('RULE', 'expression'), ['asd\n\t\\"dsa'])])])])])])])
+  'expression'), [Tree(Token('RULE', 'literal'), [Tree(Token('RULE', 'lit_int'), [12])])])])]),
+  Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'), [Tree(Token('RULE',
+  'var_sig'), [Token('TYP', 'char'), Token('CNAME', 'c')]), Tree(Token('RULE', 'expression'),
+  [Tree(Token('RULE', 'literal'), [Tree(Token('RULE', 'lit_char'), ['a'])])])])]),
+  Tree(Token('RULE', 'statement'), [Tree(Token('RULE', 'decl_var'), [Tree(Token('RULE',
+  'var_sig'), [Token('TYP', 'int'), Token('CNAME', 's')]), Tree(Token('RULE', 'expression'),
+  [Tree(Token('RULE', 'literal'), [Tree(Token('RULE', 'lit_string'), ['a', 's', 'd',
+  '\n', '\t', '\\', '"', 'd', 's', 'a'])])])])])])])])])
 parse_tree: |
   start
     decl_fun
