@@ -65,15 +65,12 @@ ex_binary: _expression BOP _expression
 
 ex_asn: CNAME "=" _expression
 
-ex_conditional: _expression "?" _expression ":" _expression
-
 ex_rd_var: CNAME
 
 ex_lit: _literal
 
 _expression: _paren{_expression}
           | ex_lit
-          | ex_conditional
           | ex_call
           | ex_binary
           | ex_uop
@@ -101,8 +98,7 @@ MAT_STAR: "*"
 MAT_DIV: "/"
 MAT_MOD: "%"
 
-OP_LOG: LOG_XOR | LOG_AND | LOG_OR | LOG_LAND | LOG_LOR | LOG_RIGHT | LOG_LEFT
-LOG_XOR: "^"
+OP_LOG: LOG_AND | LOG_OR | LOG_LAND | LOG_LOR | LOG_RIGHT | LOG_LEFT
 LOG_AND: "&"
 LOG_OR: "|"
 LOG_LAND: "&&"

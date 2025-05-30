@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import *
 
-from hir import HFunLayout, HVar
+from printer.hir import HFunLayout, HVar
 
 """
 Data
@@ -165,7 +165,7 @@ class IRStCall(IRStatement):
 
 @dataclass
 class IRStReturn(IRStatement):
-    var: str
+    var: Optional[str] = None
 
     @property
     def v_inputs(self):

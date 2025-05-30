@@ -1,6 +1,7 @@
 import dataclasses
 
-from printer.emitter import Emitter, BaseTransformer
+from printer.emitter import Emitter
+from printer.base_transformer import BaseVisitor
 from printer.hir import *
 from printer.hir import HRegVar
 from printer.ir import *
@@ -20,7 +21,7 @@ class Context:
     def global_names(self) -> List[str]:
         return [*self.globals.keys(), ]
 
-class RV64IR2ASMTransformer(BaseTransformer, Emitter):
+class RV64IR2ASMTransformer(BaseVisitor, Emitter):
     TYPE_DECODER_FOR_DECL = {
         IRType.INT: "quad",
         IRType.CHAR: "byte",
@@ -196,6 +197,9 @@ class RV64IR2ASMTransformer(BaseTransformer, Emitter):
             self.emit_label(x.label)
 
     def IRStReturn(self, x: IRStReturn):
+        if x.var is None:
+            self(IRStJump(target=self.fun.exit_label))
+            return
         original_ret_var = self.fun.layout.mem_slots.get(x.var, None)
         if original_ret_var is None:
             self.throw("not existing var", x.var)
@@ -369,5 +373,5 @@ res = do_asm(
         ]
     )
 )
-print(res)
-print(run_qemu(res))
+# print(res)
+# print(run_qemu(res))

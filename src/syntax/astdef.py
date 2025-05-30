@@ -8,7 +8,7 @@ from typing import *
 from lark import ast_utils, Transformer, v_args, Tree, Token
 
 from parser.parser import do_parse
-from syntax.exptypes import UOP_MATCH, UOp, BOp
+from syntax.extypes import UOP_MATCH, UOp, BOp, BOP_MATCH
 from utils import string_unescape
 
 """
@@ -206,18 +206,10 @@ class ExCall(_Expression):
         self.name = name
         self.args = args
 
-
-@dataclass
-class ExConditional(_Expression):
-    check_expr: Expression
-    true: Expression
-    false: Expression
-
-
 @dataclass
 class ExUnary(_Expression):
     cmd: UOp
-    value: Any
+    value: Expression
 
 
 @dataclass
@@ -282,6 +274,10 @@ class ToAst(Transformer):
                 return None
         return ExUnary(UOP_MATCH[cmd], exp)
 
+    @v_args(inline=True)
+    def BOP(self, x):
+        return BOP_MATCH[str(x)]
+
     def start(self, x):
         funcs = {i.sig.name: i for i in x if isinstance(i, DeclFun)}
         funcs.update({i.name: DeclFun(i) for i in x if isinstance(i, DeclFunSig)})
@@ -294,21 +290,5 @@ class ToAst(Transformer):
 transformer = ast_utils.create_transformer(sys.modules[__name__], ToAst())
 
 
-def do_ast(tree):
+def do_ast(tree: Tree) -> Prog:
     return transformer.transform(tree)
-
-
-def demo():
-    x = open("/home/petr/projects/compiler-py-impl/tests/golden/test.c").read()
-    x = do_parse(x)
-    with open("/home/petr/projects/compiler-py-impl/tests/golden/test.p", "w") as f:
-        f.write(x.pretty())
-    x = do_ast(x)
-    with open("/home/petr/projects/compiler-py-impl/tests/golden/test.a", "w") as f:
-        pprint(x, f, width=40)
-        f.flush()
-    return x
-
-
-demo()
-# ['children', 'copy', 'data', 'expand_kids_by_data', 'find_data', 'find_pred', 'iter_subtrees', 'iter_subtrees_topdown', 'meta', 'pretty', 'scan_values', 'set']

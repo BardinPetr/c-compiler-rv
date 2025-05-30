@@ -165,7 +165,7 @@ def statement_substitute_vars(x: IRStatement, irepl: Dict[str, str], orepl: Dict
             x.arg = irepl.get(arg, arg)
         case IRStCJump(_, checked_var, _):
             x.checked_var = irepl.get(checked_var, checked_var)
-        case IRStReturn(var):
+        case IRStReturn(var) if var is not None:
             x.var = irepl.get(var, var)
         case IRStCall(_, arg_vars, assign_var):
             x.arg_vars = [irepl.get(i, i) for i in arg_vars]

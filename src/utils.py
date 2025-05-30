@@ -5,9 +5,10 @@ import shlex
 import signal
 import string
 import subprocess
+from collections.abc import generator
 from os.path import dirname, realpath
 from random import random, choices
-from typing import Optional, Tuple, List, Type
+from typing import Optional, Tuple, List, Type, Any
 
 
 def dirpath(f):
@@ -63,5 +64,10 @@ def class_hierarchy(x) -> List[Type]:
 def str_class_hierarchy(x) -> List[str]:
     return [i.__name__ for i in class_hierarchy(x)]
 
-def random_string(n: int) -> str:
+def random_string(n: int=6) -> str:
     return ''.join(choices(string.ascii_lowercase, k=n))
+
+def flatten(x: Any) -> List:
+    if isinstance(x, list | tuple | generator | set):
+        return sum([flatten(i) for i in x], start=[])
+    return [x]

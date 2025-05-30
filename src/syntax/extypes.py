@@ -16,7 +16,6 @@ class BOp(StrEnum):
     MAT_STAR = auto()
     MAT_DIV = auto()
     MAT_MOD = auto()
-    LOG_XOR = auto()
     LOG_AND = auto()
     LOG_OR = auto()
     LOG_LAND = auto()
@@ -40,7 +39,6 @@ BOP_MATCH = {
     ">": BOp.CMP_GT,
     "==": BOp.CMP_EQ,
     "!=": BOp.CMP_NE,
-    "^": BOp.LOG_XOR,
     "&": BOp.LOG_AND,
     "|": BOp.LOG_OR,
     "&&": BOp.LOG_LAND,
