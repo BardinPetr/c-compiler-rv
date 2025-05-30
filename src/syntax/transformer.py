@@ -8,6 +8,7 @@ from typing import *
 from lark import ast_utils, Transformer, v_args, Tree, Token
 
 from parser.parser import do_parse
+from syntax.exptypes import UOP_MATCH, UOp, BOp
 from utils import string_unescape
 
 """
@@ -175,9 +176,56 @@ class StReturn(_Statement):
     value: Optional[Expression] = None
 
 
+@dataclass
+class StAsn(_Statement):
+    dst: str
+    expr: _Expression
+
+
 """
     Expressions
 """
+
+
+@dataclass
+class ExRdVar(_Expression):
+    name: str
+
+
+@dataclass
+class ExLit(_Expression):
+    value: Literal
+
+
+@dataclass
+class ExCall(_Expression):
+    name: str
+    args: List[Expression]
+
+    def __init__(self, name: str, *args: List[Expression]):
+        self.name = name
+        self.args = args
+
+
+@dataclass
+class ExConditional(_Expression):
+    check_expr: Expression
+    true: Expression
+    false: Expression
+
+
+@dataclass
+class ExUnary(_Expression):
+    cmd: UOp
+    value: Any
+
+
+@dataclass
+class ExBinary(_Expression):
+    exp1: Expression
+    cmd: BOp
+    exp2: Expression
+
 
 """
     Other manual transforms
@@ -222,6 +270,17 @@ class ToAst(Transformer):
 
     def block(self, lines):
         return lines
+
+    @v_args(inline=True)
+    def ex_uop(self, x):
+        match x.children:
+            case [Token(_, cmd), exp]:
+                pass
+            case [exp, Token(_, cmd)]:
+                pass
+            case _:
+                return None
+        return ExUnary(UOP_MATCH[cmd], exp)
 
     def start(self, x):
         funcs = {i.sig.name: i for i in x if isinstance(i, DeclFun)}

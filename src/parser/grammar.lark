@@ -30,15 +30,17 @@ decl_static_var: var_sig ["=" _literal]
 
 _statement: st_if
           | st_while
-          | (st_var_decl | st_return | _st_cmd | expression) ";"
+          | (st_asn | st_var_decl | st_return | _st_cmd | _expression) ";"
 
-st_var_decl: var_sig ["=" expression]
+st_var_decl: var_sig ["=" _expression]
 
-st_if: "if" _paren{expression} block_or_line ["else" block_or_line]
+st_if: "if" _paren{_expression} block_or_line ["else" block_or_line]
 
-st_while: "while" _paren{expression} block_or_line
+st_while: "while" _paren{_expression} block_or_line
 
-st_return: "return" expression?
+st_return: "return" _expression?
+
+st_asn: CNAME "=" _expression
 
 _st_cmd: KW_BREAK
        | KW_CONTINUE
@@ -51,28 +53,31 @@ block_or_line: block | _statement
 
 // expressions
 
-ex_prefix: UOP_PREFIX expression
-         | KW_SIZEOF _paren{TYP}
+ex_prefix: UOP_PREFIX _expression
 
-ex_postfix: expression UOP_POSTFIX
+ex_postfix: _expression UOP_POSTFIX
 
-ex_call: CNAME _paren{_sep0{expression}}
+ex_uop: ex_prefix | ex_postfix
 
-ex_binary: expression BOP expression
+ex_call: CNAME _paren{_sep0{_expression}}
 
-ex_conditional: expression "?" expression ":" expression
+ex_binary: _expression BOP _expression
 
-ex_rdvar: CNAME
+ex_asn: CNAME "=" _expression
 
-expression: _paren{expression}
-          | _literal
-          | ex_rdvar
-          | ex_prefix
-          | ex_postfix
+ex_conditional: _expression "?" _expression ":" _expression
+
+ex_rd_var: CNAME
+
+ex_lit: _literal
+
+_expression: _paren{_expression}
+          | ex_lit
+          | ex_conditional
           | ex_call
           | ex_binary
-          | ex_conditional
-
+          | ex_uop
+          | ex_rd_var
 
 // literals
 
@@ -87,9 +92,7 @@ lit_string: "\"" STRING "\""
 
 // terminals
 
-BOP: OP_MAT | OP_LOG | OP_CMP | OP_ASN
-
-OP_ASN: "="
+BOP: OP_MAT | OP_LOG | OP_CMP
 
 OP_MAT: MAT_STAR | MAT_DIV | MAT_MOD | MAT_PLUS | MAT_MINUS
 MAT_PLUS: "+"
@@ -127,7 +130,6 @@ UOP_INC: "++"
 KW_CONTINUE: "continue"
 KW_BREAK: "break"
 KW_RETURN: "return"
-KW_SIZEOF: "sizeof"
 
 TYP: TYP_CHAR | TYP_INT | TYP_STRING | TYP_VOID
 TYP_INT: "int"
