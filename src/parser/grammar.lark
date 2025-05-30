@@ -12,8 +12,8 @@ _brace{x}: "{" x "}"
 // declarations
 
 _decl_global: decl_fun_sig ";"
-             | decl_var ";"
-             | decl_fun
+            | decl_static_var ";"
+            | decl_fun
 
 var_sig: TYP CNAME
 
@@ -23,27 +23,31 @@ decl_fun_sig: TYP CNAME decl_fun_sig_params
 
 decl_fun_sig_params: _paren{_sep0{var_sig}}
 
-decl_var: var_sig ["=" _literal]
+decl_static_var: var_sig ["=" _literal]
 
 
 // statements
 
-statement: (expression | decl_var | st_cmd) ";"
-         | st_if
-         | st_while
+_statement: st_if
+          | st_while
+          | (st_var_decl | st_return | _st_cmd | expression) ";"
 
-st_cmd: KW_BREAK | KW_RETURN expression?
+st_var_decl: var_sig ["=" expression]
 
 st_if: "if" _paren{expression} block_or_line ["else" block_or_line]
 
 st_while: "while" _paren{expression} block_or_line
 
+st_return: "return" expression?
+
+_st_cmd: KW_BREAK
+       | KW_CONTINUE
+
 // blocks
 
-statements: statement*
-block: _brace{ statements }
-
-block_or_line: block | statement
+_statements: _statement*
+block: _brace{ _statements }
+block_or_line: block | _statement
 
 // expressions
 
@@ -120,6 +124,7 @@ UOP_POSTFIX: UOP_DEC | UOP_INC
 UOP_DEC: "--"
 UOP_INC: "++"
 
+KW_CONTINUE: "continue"
 KW_BREAK: "break"
 KW_RETURN: "return"
 KW_SIZEOF: "sizeof"

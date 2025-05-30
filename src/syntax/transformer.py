@@ -1,22 +1,35 @@
 import sys
 from dataclasses import dataclass
 from enum import StrEnum, auto
+from multiprocessing.managers import Token
 from pprint import pprint
 from typing import *
 
-from lark import ast_utils, Transformer
+from lark import ast_utils, Transformer, v_args, Tree, Token
 
 from parser.parser import do_parse
 from utils import string_unescape
+
+"""
+    Base parts
+"""
 
 
 class _Ast(ast_utils.Ast):
     pass
 
 
+class _Expression(_Ast):
+    pass
+
+
 class _Statement(_Ast):
     pass
 
+
+type Expression = _Expression
+type Statement = _Statement
+type Block = List[_Statement]
 
 """
     Data
@@ -94,11 +107,11 @@ class DeclFunSig(_DeclGlobal):
 @dataclass
 class DeclFun(_DeclGlobal):
     sig: DeclFunSig
-    body: Optional[List[Any]] = None
+    body: Optional[Block] = None
 
 
 @dataclass
-class DeclVar(_DeclGlobal):
+class DeclStaticVar(_DeclGlobal):
     sig: VarSig
     init: Optional[_Literal] = None
 
@@ -109,21 +122,66 @@ class DeclVar(_DeclGlobal):
 
 @dataclass
 class Prog:
-    globals: List[DeclVar]
+    globals: List[DeclStaticVar]
     functions: Dict[str, DeclFun]
 
 
 """
+    Statements
 """
 
 
-# class Expression(_Ast):
-#     pass
+@dataclass
+class StIf(_Statement):
+    check_expr: Expression
+    br_true: Optional[Block]
+    br_false: Optional[Block] = None
+
+    def __post_init__(self):
+        if self.br_false is not None and len(self.br_false) == 0:
+            self.br_false = None
+        if len(self.br_true) == 0:
+            self.br_true = None
 
 
-# @dataclass
-# class Start(_Ast, ast_utils.AsList):
-#     decls: List[_Statement]
+@dataclass
+class StWhile(_Statement):
+    check_expr: Expression
+    body: Block
+
+
+@dataclass
+class StVarDecl(_Statement):
+    sig: VarSig
+    init: Optional[Expression] = None
+
+    def __post_init__(self):
+        if self.init is None and self.sig.type == DataType.STRING:
+            raise Exception("Empty string declaration disallowed")
+
+
+@dataclass
+class StBreak(_Statement):
+    pass
+
+
+@dataclass
+class StContinue(_Statement):
+    pass
+
+
+@dataclass
+class StReturn(_Statement):
+    value: Optional[Expression] = None
+
+
+"""
+    Expressions
+"""
+
+"""
+    Other manual transforms
+"""
 
 
 class ToAst(Transformer):
@@ -145,21 +203,31 @@ class ToAst(Transformer):
     def STRING(self, s):
         return string_unescape(s)
 
-    #
-    # def lit_char(self, s):
-    #     return s[0]
-    #
-    # def lit_string(self, s):
-    #     return ''.join(s)
-    #
-    # def lit_int(self, s):
-    #     return s[0]
+    def KW_BREAK(self, _):
+        return StBreak()
+
+    def KW_CONTINUE(self, _):
+        return StContinue()
+
+    @v_args(inline=True)
+    def block_or_line(self, x):
+        """ unpack blocks/oneline to list """
+        match x:
+            case Tree(data=Token(_, "block"), children=lines):
+                return lines
+            case list(lines):
+                return lines
+            case _:
+                return [x]
+
+    def block(self, lines):
+        return lines
 
     def start(self, x):
         funcs = {i.sig.name: i for i in x if isinstance(i, DeclFun)}
         funcs.update({i.name: DeclFun(i) for i in x if isinstance(i, DeclFunSig)})
         return Prog(
-            globals=[i for i in x if isinstance(i, DeclVar)],
+            globals=[i for i in x if isinstance(i, DeclStaticVar)],
             functions=funcs
         )
 
@@ -179,6 +247,9 @@ def demo():
     x = do_ast(x)
     with open("/home/petr/projects/compiler-py-impl/tests/golden/test.a", "w") as f:
         pprint(x, f, width=40)
+        f.flush()
+    return x
 
 
 demo()
+# ['children', 'copy', 'data', 'expand_kids_by_data', 'find_data', 'find_pred', 'iter_subtrees', 'iter_subtrees_topdown', 'meta', 'pretty', 'scan_values', 'set']
