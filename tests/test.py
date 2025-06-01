@@ -3,10 +3,10 @@ import pprint
 import pytest
 from pytest_golden.plugin import GoldenTestFixture
 
-from parser.parser import do_parse
-from printer.ir2asm import do_asm
-from syntax.astdef import do_ast
-from syntax.ast2ir import do_ir
+from frontend.parser import do_parse
+from backend.ir2asm import do_asm
+from frontend.astdef import do_ast
+from middlend.ast2ir import do_ir
 from tests.qemu import run_qemu
 
 

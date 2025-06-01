@@ -1,6 +1,6 @@
-from printer.hir import *
-from printer.ir import *
-from printer.rv64 import RV64Reg
+from backend.ir.hir import *
+from backend.ir.ir import *
+from backend.hw.rv64 import RV64Reg
 from utils import random_string
 
 

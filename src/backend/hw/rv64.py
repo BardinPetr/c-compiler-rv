@@ -1,5 +1,5 @@
-from printer.ir import IRCJumpType, IRBOp, IRUOp
-from printer.reg import *
+from backend.ir.ir import IRCJumpType, IRBOp
+from backend.hw.reg import *
 
 
 class RV64Reg(Reg):

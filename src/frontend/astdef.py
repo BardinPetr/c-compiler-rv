@@ -2,13 +2,11 @@ import sys
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from multiprocessing.managers import Token
-from pprint import pprint
 from typing import *
 
 from lark import ast_utils, Transformer, v_args, Tree, Token
 
-from parser.parser import do_parse
-from syntax.extypes import UOP_MATCH, UOp, BOp, BOP_MATCH
+from frontend.extypes import UOP_MATCH, UOp, BOp, BOP_MATCH
 from utils import string_unescape
 
 """

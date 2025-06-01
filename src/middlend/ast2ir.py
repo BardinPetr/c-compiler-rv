@@ -1,11 +1,11 @@
 from collections.abc import generator
 from contextlib import contextmanager
 
-from printer.base_transformer import BaseTransformer, TCtx, CtxTransformer
-from printer.ir import *
-from printer.ir import IRType
-from syntax.astdef import *
-from syntax.astdef import _Literal, _Expression, ExRdVar
+from backend.base.base_transformer import BaseTransformer, TCtx, CtxTransformer
+from backend.ir.ir import *
+from backend.ir.ir import IRType
+from frontend.astdef import *
+from frontend.astdef import _Literal, _Expression, ExRdVar
 from utils import flatten, random_string
 
 
