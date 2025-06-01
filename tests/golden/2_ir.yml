@@ -1,0 +1,1042 @@
+test_level: parse,ast,ir
+text: |-
+  int global_i = 0;
+  char global_c = 't';
+  string global_s = "hello!\n";
+  int gi;
+  char gc;
+
+  void putc(char c);
+  void puts(string s);
+  void puti(int i);
+
+
+  void f() {
+      int a = 1;
+      return a;
+  }
+
+  void a1() {
+      int b = 0;
+      return 1 + 2 * b++ / f(1, b, 4 * b);
+  }
+
+  int a2() {
+      int a = 1;
+      if(a > 3) {
+          int b = 0;
+      }
+      else {
+          int c = 0;
+      }
+  }
+
+  int a3() {
+      while(a++ < 10) {
+          a++;
+      }
+  }
+
+  void g() {
+         if (0) int a;
+         if (0) {
+          int a;
+         }
+         if (0) {
+              int a;
+              int b;
+         } else {
+              int b;
+         }
+         while(1) {
+
+         }
+
+          int a;
+          int b = 0;
+          int c = b;
+
+          break;
+          continue;
+          return;
+          return 1;
+      a;
+      1;
+      a(1, a, 2);
+
+      -1;
+      -a;
+      !a;
+      a++;
+      a--;
+
+      1 + (N * 3);
+
+  }
+
+
+  int g(int a, char b) {
+      int c = 0;
+      c = c + a;
+      b = a * c;
+      int d = a + b + c;
+      return d % 10;
+  }
+
+  int h(int x) {
+      if (x == 0) {
+          return 1;
+      }
+      int b = -1;
+      if ((x * 5) < 10) {
+          b = 10;
+          b = b * x;
+      }
+      return b;
+  }
+
+  int j() {
+      int c = 0;
+      puts("->");
+      while (c++ < 10) {
+          puti(c);
+          puts("\n->");
+      }
+  }
+
+  void main() {
+      j();
+  }
+ir_text: |-
+  IRProg(functions=[IRFun(name='f',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__deisiy',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='a',
+                                         arg='__deisiy'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__xvgqod',
+                                         arg='a'),
+                                IRStReturn(label=None, var='__xvgqod')],
+                          layout=None),
+                    IRFun(name='a1',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__hnneye',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='b',
+                                         arg='__hnneye'),
+                                IRStStoreValue(label=None,
+                                               dest='__abqoqt',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStStoreValue(label=None,
+                                               dest='__kqmqhy',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=2)),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='b',
+                                          arg1='b',
+                                          arg2='1'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__kqmqhy',
+                                          arg1='__kqmqhy',
+                                          arg2='b'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__abqoqt',
+                                          arg1='__abqoqt',
+                                          arg2='__kqmqhy'),
+                                IRStStoreValue(label=None,
+                                               dest='__murhbb',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStStoreValue(label=None,
+                                               dest='__lmfpis',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=4)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__lmfpis',
+                                          arg1='__lmfpis',
+                                          arg2='b'),
+                                IRStCall(label=None,
+                                         fun_name='f',
+                                         arg_vars=['__murhbb', 'b', '__lmfpis'],
+                                         assign_var='__twzdjo'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.DIV: 'div'>,
+                                          dest='__abqoqt',
+                                          arg1='__abqoqt',
+                                          arg2='__twzdjo'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__rspvov',
+                                         arg='__abqoqt'),
+                                IRStReturn(label=None, var='__rspvov')],
+                          layout=None),
+                    IRFun(name='a2',
+                          ret_typ=<IRType.INT: 'int'>,
+                          params=[],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__imggch',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='a',
+                                         arg='__imggch'),
+                                IRStStoreValue(label=None,
+                                               dest='__jbmwrm',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=3)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CGT: 'cgt'>,
+                                          dest='__nwlwst',
+                                          arg1='a',
+                                          arg2='__jbmwrm'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__jpgwei',
+                                         arg='__nwlwst'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__jpgwei',
+                                          jump_to='__pitmnm'),
+                                IRStStoreValue(label=None,
+                                               dest='__jkofob',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='b',
+                                         arg='__jkofob'),
+                                IRStJump(label=None, target='__iaynzf'),
+                                IRStatement(label='__pitmnm'),
+                                IRStStoreValue(label=None,
+                                               dest='__nthzrd',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='c',
+                                         arg='__nthzrd'),
+                                IRStatement(label='__iaynzf')],
+                          layout=None),
+                    IRFun(name='a3',
+                          ret_typ=<IRType.INT: 'int'>,
+                          params=[],
+                          body=[IRStatement(label='__zkuiyt'),
+                                IRStatement(label='__ezthiv'),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='a',
+                                          arg1='a',
+                                          arg2='1'),
+                                IRStStoreValue(label=None,
+                                               dest='__zpusra',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__mzuups',
+                                          arg1='a',
+                                          arg2='__zpusra'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__nshvjr',
+                                         arg='__mzuups'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__nshvjr',
+                                          jump_to='__fnnbdi'),
+                                IRStatement(label='__mlpnip'),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='a',
+                                          arg1='a',
+                                          arg2='1'),
+                                IRStJump(label=None, target='__ezthiv'),
+                                IRStatement(label='__fnnbdi')],
+                          layout=None),
+                    IRFun(name='g',
+                          ret_typ=<IRType.INT: 'int'>,
+                          params=[IRFunParam(name='a', type=<IRType.INT: 'int'>),
+                                  IRFunParam(name='b', type=<IRType.CHAR: 'char'>)],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__peqqvd',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='c',
+                                         arg='__peqqvd'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__raycai',
+                                          arg1='c',
+                                          arg2='a'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='c',
+                                         arg='__raycai'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__drkuxw',
+                                          arg1='a',
+                                          arg2='c'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='b',
+                                         arg='__drkuxw'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__tbdfir',
+                                          arg1='a',
+                                          arg2='b'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__tbdfir',
+                                          arg1='__tbdfir',
+                                          arg2='c'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='d',
+                                         arg='__tbdfir'),
+                                IRStStoreValue(label=None,
+                                               dest='__usqspe',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.REM: 'rem'>,
+                                          dest='__gofzhh',
+                                          arg1='d',
+                                          arg2='__usqspe'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__niexij',
+                                         arg='__gofzhh'),
+                                IRStReturn(label=None, var='__niexij')],
+                          layout=None),
+                    IRFun(name='h',
+                          ret_typ=<IRType.INT: 'int'>,
+                          params=[IRFunParam(name='x', type=<IRType.INT: 'int'>)],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__lgmfoy',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CEQ: 'ceq'>,
+                                          dest='__sdqpgr',
+                                          arg1='x',
+                                          arg2='__lgmfoy'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__fsijyu',
+                                         arg='__sdqpgr'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__fsijyu',
+                                          jump_to='__hdrjzv'),
+                                IRStStoreValue(label=None,
+                                               dest='__uaoyky',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__nqbksc',
+                                         arg='__uaoyky'),
+                                IRStReturn(label=None, var='__nqbksc'),
+                                IRStJump(label=None, target='__yuhhsj'),
+                                IRStatement(label='__hdrjzv'),
+                                IRStatement(label='__yuhhsj'),
+                                IRStStoreValue(label=None,
+                                               dest='__wmfziq',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=-1)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='b',
+                                         arg='__wmfziq'),
+                                IRStStoreValue(label=None,
+                                               dest='__aoczhz',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=5)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__omywmf',
+                                          arg1='x',
+                                          arg2='__aoczhz'),
+                                IRStStoreValue(label=None,
+                                               dest='__celget',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__omywmf',
+                                          arg1='__omywmf',
+                                          arg2='__celget'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__xconsy',
+                                         arg='__omywmf'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__xconsy',
+                                          jump_to='__xewexz'),
+                                IRStStoreValue(label=None,
+                                               dest='__uotewx',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='b',
+                                         arg='__uotewx'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__vncred',
+                                          arg1='b',
+                                          arg2='x'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='b',
+                                         arg='__vncred'),
+                                IRStJump(label=None, target='__kmyzyw'),
+                                IRStatement(label='__xewexz'),
+                                IRStatement(label='__kmyzyw'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__igggty',
+                                         arg='b'),
+                                IRStReturn(label=None, var='__igggty')],
+                          layout=None),
+                    IRFun(name='j',
+                          ret_typ=<IRType.INT: 'int'>,
+                          params=[],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__hsaqsb',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='c',
+                                         arg='__hsaqsb'),
+                                IRStStoreValue(label=None,
+                                               dest='__dhknxs',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='->')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__dhknxs'],
+                                         assign_var='__idxhpf'),
+                                IRStatement(label='__ddtpko'),
+                                IRStatement(label='__bonodi'),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='c',
+                                          arg1='c',
+                                          arg2='1'),
+                                IRStStoreValue(label=None,
+                                               dest='__vlnlbm',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__uskvtp',
+                                          arg1='c',
+                                          arg2='__vlnlbm'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__ndfpcn',
+                                         arg='__uskvtp'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__ndfpcn',
+                                          jump_to='__mnrfgt'),
+                                IRStatement(label='__wclsco'),
+                                IRStCall(label=None,
+                                         fun_name='puti',
+                                         arg_vars=['c'],
+                                         assign_var='__bibzyb'),
+                                IRStStoreValue(label=None,
+                                               dest='__yakttz',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='\n->')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__yakttz'],
+                                         assign_var='__qkzjwx'),
+                                IRStJump(label=None, target='__bonodi'),
+                                IRStatement(label='__mnrfgt')],
+                          layout=None),
+                    IRFun(name='main',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[],
+                          body=[IRStCall(label=None,
+                                         fun_name='j',
+                                         arg_vars=[],
+                                         assign_var='__jrroqj')],
+                          layout=None),
+                    IRFun(name='putc',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='c', type=<IRType.CHAR: 'char'>)],
+                          body=None,
+                          layout=None),
+                    IRFun(name='puts',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='s', type=<IRType.STRING: 'string'>)],
+                          body=None,
+                          layout=None),
+                    IRFun(name='puti',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='i', type=<IRType.INT: 'int'>)],
+                          body=None,
+                          layout=None)],
+         globals=[IRGlobal(name='global_i',
+                           type=<IRType.INT: 'int'>,
+                           val=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                  IRGlobal(name='global_c',
+                           type=<IRType.CHAR: 'char'>,
+                           val=IRCharValue(type=<IRType.INT: 'int'>, value='t')),
+                  IRGlobal(name='global_s',
+                           type=<IRType.STRING: 'string'>,
+                           val=IRStringValue(type=<IRType.STRING: 'string'>, value='hello!\n')),
+                  IRGlobal(name='gi', type=<IRType.INT: 'int'>, val=None),
+                  IRGlobal(name='gc', type=<IRType.CHAR: 'char'>, val=None)])
+ast_tree: |-
+  Prog(globals=[DeclStaticVar(sig=Var<global_i:DT<int>>,
+                              init=LitInt(value=0)),
+                DeclStaticVar(sig=Var<global_c:DT<char>>,
+                              init=LitChar(value='t')),
+                DeclStaticVar(sig=Var<global_s:DT<string>>,
+                              init=LitString(value='hello!\n')),
+                DeclStaticVar(sig=Var<gi:DT<int>>,
+                              init=None),
+                DeclStaticVar(sig=Var<gc:DT<char>>,
+                              init=None)],
+       functions={'a1': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                               name='a1',
+                                               args=[]),
+                                body=[StVarDecl(sig=Var<b:DT<int>>,
+                                                init=ExLit(value=LitInt(value=0))),
+                                      StReturn(value=ExBinary(exp1=ExBinary(exp1=ExLit(value=LitInt(value=1)),
+                                                                            cmd=B<mat_plus>,
+                                                                            exp2=ExBinary(exp1=ExLit(value=LitInt(value=2)),
+                                                                                          cmd=B<mat_star>,
+                                                                                          exp2=ExUnary(cmd=U<uop_inc>,
+                                                                                                       value=ExRdVar(name='b')))),
+                                                              cmd=B<mat_div>,
+                                                              exp2=ExCall(name='f',
+                                                                          args=(ExLit(value=LitInt(value=1)),
+                                                                                ExRdVar(name='b'),
+                                                                                ExBinary(exp1=ExLit(value=LitInt(value=4)),
+                                                                                         cmd=B<mat_star>,
+                                                                                         exp2=ExRdVar(name='b'))))))]),
+                  'a2': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                               name='a2',
+                                               args=[]),
+                                body=[StVarDecl(sig=Var<a:DT<int>>,
+                                                init=ExLit(value=LitInt(value=1))),
+                                      StIf(check_expr=ExBinary(exp1=ExRdVar(name='a'),
+                                                               cmd=B<cmp_gt>,
+                                                               exp2=ExLit(value=LitInt(value=3))),
+                                           br_true=[StVarDecl(sig=Var<b:DT<int>>,
+                                                              init=ExLit(value=LitInt(value=0)))],
+                                           br_false=[StVarDecl(sig=Var<c:DT<int>>,
+                                                               init=ExLit(value=LitInt(value=0)))])]),
+                  'a3': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                               name='a3',
+                                               args=[]),
+                                body=[StWhile(check_expr=ExBinary(exp1=ExUnary(cmd=U<uop_inc>,
+                                                                               value=ExRdVar(name='a')),
+                                                                  cmd=B<cmp_lt>,
+                                                                  exp2=ExLit(value=LitInt(value=10))),
+                                              body=[ExUnary(cmd=U<uop_inc>,
+                                                            value=ExRdVar(name='a'))])]),
+                  'f': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                              name='f',
+                                              args=[]),
+                               body=[StVarDecl(sig=Var<a:DT<int>>,
+                                               init=ExLit(value=LitInt(value=1))),
+                                     StReturn(value=ExRdVar(name='a'))]),
+                  'g': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                              name='g',
+                                              args=[Var<a:DT<int>>,
+                                                    Var<b:DT<char>>]),
+                               body=[StVarDecl(sig=Var<c:DT<int>>,
+                                               init=ExLit(value=LitInt(value=0))),
+                                     StAsn(dst='c',
+                                           expr=ExBinary(exp1=ExRdVar(name='c'),
+                                                         cmd=B<mat_plus>,
+                                                         exp2=ExRdVar(name='a'))),
+                                     StAsn(dst='b',
+                                           expr=ExBinary(exp1=ExRdVar(name='a'),
+                                                         cmd=B<mat_star>,
+                                                         exp2=ExRdVar(name='c'))),
+                                     StVarDecl(sig=Var<d:DT<int>>,
+                                               init=ExBinary(exp1=ExBinary(exp1=ExRdVar(name='a'),
+                                                                           cmd=B<mat_plus>,
+                                                                           exp2=ExRdVar(name='b')),
+                                                             cmd=B<mat_plus>,
+                                                             exp2=ExRdVar(name='c'))),
+                                     StReturn(value=ExBinary(exp1=ExRdVar(name='d'),
+                                                             cmd=B<mat_mod>,
+                                                             exp2=ExLit(value=LitInt(value=10))))]),
+                  'h': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                              name='h',
+                                              args=[Var<x:DT<int>>]),
+                               body=[StIf(check_expr=ExBinary(exp1=ExRdVar(name='x'),
+                                                              cmd=B<cmp_eq>,
+                                                              exp2=ExLit(value=LitInt(value=0))),
+                                          br_true=[StReturn(value=ExLit(value=LitInt(value=1)))],
+                                          br_false=None),
+                                     StVarDecl(sig=Var<b:DT<int>>,
+                                               init=ExLit(value=LitInt(value=-1))),
+                                     StIf(check_expr=ExBinary(exp1=ExBinary(exp1=ExRdVar(name='x'),
+                                                                            cmd=B<mat_star>,
+                                                                            exp2=ExLit(value=LitInt(value=5))),
+                                                              cmd=B<cmp_lt>,
+                                                              exp2=ExLit(value=LitInt(value=10))),
+                                          br_true=[StAsn(dst='b',
+                                                         expr=ExLit(value=LitInt(value=10))),
+                                                   StAsn(dst='b',
+                                                         expr=ExBinary(exp1=ExRdVar(name='b'),
+                                                                       cmd=B<mat_star>,
+                                                                       exp2=ExRdVar(name='x')))],
+                                          br_false=None),
+                                     StReturn(value=ExRdVar(name='b'))]),
+                  'j': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
+                                              name='j',
+                                              args=[]),
+                               body=[StVarDecl(sig=Var<c:DT<int>>,
+                                               init=ExLit(value=LitInt(value=0))),
+                                     ExCall(name='puts',
+                                            args=(ExLit(value=LitString(value='->')),)),
+                                     StWhile(check_expr=ExBinary(exp1=ExUnary(cmd=U<uop_inc>,
+                                                                              value=ExRdVar(name='c')),
+                                                                 cmd=B<cmp_lt>,
+                                                                 exp2=ExLit(value=LitInt(value=10))),
+                                             body=[ExCall(name='puti',
+                                                          args=(ExRdVar(name='c'),)),
+                                                   ExCall(name='puts',
+                                                          args=(ExLit(value=LitString(value='\n'
+                                                                                            '->')),))])]),
+                  'main': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='main',
+                                                 args=[]),
+                                  body=[ExCall(name='j',
+                                               args=())]),
+                  'putc': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='putc',
+                                                 args=[Var<c:DT<char>>]),
+                                  body=None),
+                  'puti': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='puti',
+                                                 args=[Var<i:DT<int>>]),
+                                  body=None),
+                  'puts': DeclFun(sig=DeclFunSig(ret_type=DT<void>,
+                                                 name='puts',
+                                                 args=[Var<s:DT<string>>]),
+                                  body=None)})
+parse_tree: |
+  start
+    decl_static_var
+      var_sig
+        int
+        global_i
+      lit_int	0
+    decl_static_var
+      var_sig
+        char
+        global_c
+      lit_char	t
+    decl_static_var
+      var_sig
+        string
+        global_s
+      lit_string	hello!\n
+    decl_static_var
+      var_sig
+        int
+        gi
+    decl_static_var
+      var_sig
+        char
+        gc
+    decl_fun_sig
+      void
+      putc
+      decl_fun_sig_params
+        var_sig
+          char
+          c
+    decl_fun_sig
+      void
+      puts
+      decl_fun_sig_params
+        var_sig
+          string
+          s
+    decl_fun_sig
+      void
+      puti
+      decl_fun_sig_params
+        var_sig
+          int
+          i
+    decl_fun
+      decl_fun_sig
+        void
+        f
+        decl_fun_sig_params
+      block
+        st_var_decl
+          var_sig
+            int
+            a
+          ex_lit
+            lit_int	1
+        st_return
+          ex_rd_var	a
+    decl_fun
+      decl_fun_sig
+        void
+        a1
+        decl_fun_sig_params
+      block
+        st_var_decl
+          var_sig
+            int
+            b
+          ex_lit
+            lit_int	0
+        st_return
+          ex_binary
+            ex_binary
+              ex_lit
+                lit_int	1
+              +
+              ex_binary
+                ex_lit
+                  lit_int	2
+                *
+                ex_uop
+                  ex_postfix
+                    ex_rd_var	b
+                    ++
+            /
+            ex_call
+              f
+              ex_lit
+                lit_int	1
+              ex_rd_var	b
+              ex_binary
+                ex_lit
+                  lit_int	4
+                *
+                ex_rd_var	b
+    decl_fun
+      decl_fun_sig
+        int
+        a2
+        decl_fun_sig_params
+      block
+        st_var_decl
+          var_sig
+            int
+            a
+          ex_lit
+            lit_int	1
+        st_if
+          ex_binary
+            ex_rd_var	a
+            >
+            ex_lit
+              lit_int	3
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  b
+                ex_lit
+                  lit_int	0
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  c
+                ex_lit
+                  lit_int	0
+    decl_fun
+      decl_fun_sig
+        int
+        a3
+        decl_fun_sig_params
+      block
+        st_while
+          ex_binary
+            ex_uop
+              ex_postfix
+                ex_rd_var	a
+                ++
+            <
+            ex_lit
+              lit_int	10
+          block_or_line
+            block
+              ex_uop
+                ex_postfix
+                  ex_rd_var	a
+                  ++
+    decl_fun
+      decl_fun_sig
+        void
+        g
+        decl_fun_sig_params
+      block
+        st_if
+          ex_lit
+            lit_int	0
+          block_or_line
+            st_var_decl
+              var_sig
+                int
+                a
+          None
+        st_if
+          ex_lit
+            lit_int	0
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  a
+          None
+        st_if
+          ex_lit
+            lit_int	0
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  a
+              st_var_decl
+                var_sig
+                  int
+                  b
+          block_or_line
+            block
+              st_var_decl
+                var_sig
+                  int
+                  b
+        st_while
+          ex_lit
+            lit_int	1
+          block_or_line
+            block
+        st_var_decl
+          var_sig
+            int
+            a
+        st_var_decl
+          var_sig
+            int
+            b
+          ex_lit
+            lit_int	0
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_rd_var	b
+        break
+        continue
+        st_return
+        st_return
+          ex_lit
+            lit_int	1
+        ex_rd_var	a
+        ex_lit
+          lit_int	1
+        ex_call
+          a
+          ex_lit
+            lit_int	1
+          ex_rd_var	a
+          ex_lit
+            lit_int	2
+        ex_lit
+          lit_int	-1
+        ex_uop
+          ex_prefix
+            -
+            ex_rd_var	a
+        ex_uop
+          ex_prefix
+            !
+            ex_rd_var	a
+        ex_uop
+          ex_postfix
+            ex_rd_var	a
+            ++
+        ex_uop
+          ex_postfix
+            ex_rd_var	a
+            --
+        ex_binary
+          ex_lit
+            lit_int	1
+          +
+          ex_binary
+            ex_rd_var	N
+            *
+            ex_lit
+              lit_int	3
+    decl_fun
+      decl_fun_sig
+        int
+        g
+        decl_fun_sig_params
+          var_sig
+            int
+            a
+          var_sig
+            char
+            b
+      block
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_lit
+            lit_int	0
+        st_asn
+          c
+          ex_binary
+            ex_rd_var	c
+            +
+            ex_rd_var	a
+        st_asn
+          b
+          ex_binary
+            ex_rd_var	a
+            *
+            ex_rd_var	c
+        st_var_decl
+          var_sig
+            int
+            d
+          ex_binary
+            ex_binary
+              ex_rd_var	a
+              +
+              ex_rd_var	b
+            +
+            ex_rd_var	c
+        st_return
+          ex_binary
+            ex_rd_var	d
+            %
+            ex_lit
+              lit_int	10
+    decl_fun
+      decl_fun_sig
+        int
+        h
+        decl_fun_sig_params
+          var_sig
+            int
+            x
+      block
+        st_if
+          ex_binary
+            ex_rd_var	x
+            ==
+            ex_lit
+              lit_int	0
+          block_or_line
+            block
+              st_return
+                ex_lit
+                  lit_int	1
+          None
+        st_var_decl
+          var_sig
+            int
+            b
+          ex_lit
+            lit_int	-1
+        st_if
+          ex_binary
+            ex_binary
+              ex_rd_var	x
+              *
+              ex_lit
+                lit_int	5
+            <
+            ex_lit
+              lit_int	10
+          block_or_line
+            block
+              st_asn
+                b
+                ex_lit
+                  lit_int	10
+              st_asn
+                b
+                ex_binary
+                  ex_rd_var	b
+                  *
+                  ex_rd_var	x
+          None
+        st_return
+          ex_rd_var	b
+    decl_fun
+      decl_fun_sig
+        int
+        j
+        decl_fun_sig_params
+      block
+        st_var_decl
+          var_sig
+            int
+            c
+          ex_lit
+            lit_int	0
+        ex_call
+          puts
+          ex_lit
+            lit_string	->
+        st_while
+          ex_binary
+            ex_uop
+              ex_postfix
+                ex_rd_var	c
+                ++
+            <
+            ex_lit
+              lit_int	10
+          block_or_line
+            block
+              ex_call
+                puti
+                ex_rd_var	c
+              ex_call
+                puts
+                ex_lit
+                  lit_string	\n->
+    decl_fun
+      decl_fun_sig
+        void
+        main
+        decl_fun_sig_params
+      block
+        ex_call	j

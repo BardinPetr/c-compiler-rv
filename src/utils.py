@@ -7,9 +7,10 @@ import string
 import subprocess
 from collections.abc import generator
 from os.path import dirname, realpath
-from random import random, choices
 from typing import Optional, Tuple, List, Type, Any
+import random
 
+random.seed(42)
 
 def dirpath(f):
     return dirname(realpath(f))
@@ -65,7 +66,7 @@ def str_class_hierarchy(x) -> List[str]:
     return [i.__name__ for i in class_hierarchy(x)]
 
 def random_string(n: int=6) -> str:
-    return ''.join(choices(string.ascii_lowercase, k=n))
+    return ''.join(random.choices(string.ascii_lowercase, k=n))
 
 def flatten(x: Any) -> List:
     if isinstance(x, list | tuple | generator | set):

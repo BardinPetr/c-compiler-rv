@@ -67,7 +67,7 @@ class AST2IR(BaseTransformer, CtxTransformer):
             x.sig.name,
             self(x.sig.ret_type),
             params=self(x.sig.args),
-            body=flatten(self(x.body))
+            body=flatten(self(x.body)) if x.body is not None else None
         )
 
     def _Literal(self, x: _Literal) -> IRValue:
@@ -207,6 +207,14 @@ class AST2IRExpr(BaseTransformer, CtxTransformer):
                 return
 
     def ExBinary(self, x: ExBinary):
+        match x.cmd:
+            case BOp.CMP_LE:
+                yield from self(ExBinary(x.exp1, BOp.CMP_LT, ExBinary(x.exp2, BOp.MAT_PLUS, ExLit(LitInt(1)))))
+                return
+            case BOp.CMP_GE:
+                yield from self(ExBinary(x.exp1, BOp.CMP_GT, ExBinary(x.exp2, BOp.MAT_MINUS, ExLit(LitInt(1)))))
+                return
+
         op = self.BOp(x.cmd)
         self.top_var = None
         yield from self.unwrap_call(x.exp1)
@@ -258,18 +266,3 @@ class AST2IRExpr(BaseTransformer, CtxTransformer):
 def do_ir(prog: Prog) -> IRProg:
     t = AST2IR()
     return t(prog)
-
-
-def demo():
-    x = open("/home/petr/projects/compiler-py-impl/tests/golden/test.c").read()
-    x = do_parse(x)
-    x = do_ast(x)
-    with open("/home/petr/projects/compiler-py-impl/tests/golden/test.p", "w") as f:
-        pprint(x, f, width=40)
-    x = do_ir(x)
-    with open("/home/petr/projects/compiler-py-impl/tests/golden/test.a", "w") as f:
-        pprint(x, f, width=40)
-    return x
-
-
-demo()

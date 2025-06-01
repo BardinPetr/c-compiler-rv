@@ -280,7 +280,7 @@ class ToAst(Transformer):
 
     def start(self, x):
         funcs = {i.sig.name: i for i in x if isinstance(i, DeclFun)}
-        funcs.update({i.name: DeclFun(i) for i in x if isinstance(i, DeclFunSig)})
+        funcs.update({i.name: DeclFun(i, None) for i in x if isinstance(i, DeclFunSig)})
         return Prog(
             globals=[i for i in x if isinstance(i, DeclStaticVar)],
             functions=funcs

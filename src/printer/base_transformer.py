@@ -43,7 +43,7 @@ class BaseTransformer:
                 node = getattr(self, node_name)(node)
                 fired = True
         if not fired:
-            print("no transform for", type(node))
+            # print("no transform for", type(node))
             if hasattr(self, "fallback"):
                 node = getattr(self, "fallback")(node)
 
@@ -78,4 +78,4 @@ class CtxTransformer:
     def cpeek[T](self, typ: Type[T]) -> Optional[T]:
         if typ not in self.ctx or len(self.ctx[typ]) == 0:
             return None
-        return self.ctx[typ][0]
+        return self.ctx[typ][-1]

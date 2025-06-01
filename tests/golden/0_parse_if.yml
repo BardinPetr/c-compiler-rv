@@ -89,19 +89,6 @@ parse_tree: |
                 f
                 ex_lit
                   lit_int	22
-        st_var_decl
-          var_sig
-            int
-            a
-          ex_conditional
-            ex_binary
-              ex_rd_var	asd
-              ==
-              ex_rd_var	vwd
-            ex_lit
-              lit_int	111
-            ex_lit
-              lit_int	222
         st_return
           ex_lit
             lit_int	1

@@ -109,41 +109,41 @@ ast_tree: |-
                                                init=ExLit(value=LitInt(value=0))),
                                      StAsn(dst='c',
                                            expr=ExBinary(exp1=ExRdVar(name='c'),
-                                                         cmd=Token('BOP', '+'),
+                                                         cmd=B<mat_plus>,
                                                          exp2=ExRdVar(name='a'))),
                                      StAsn(dst='b',
                                            expr=ExBinary(exp1=ExRdVar(name='a'),
-                                                         cmd=Token('BOP', '*'),
+                                                         cmd=B<mat_star>,
                                                          exp2=ExRdVar(name='c'))),
                                      StVarDecl(sig=Var<d:DT<int>>,
                                                init=ExBinary(exp1=ExBinary(exp1=ExRdVar(name='a'),
-                                                                           cmd=Token('BOP', '+'),
+                                                                           cmd=B<mat_plus>,
                                                                            exp2=ExRdVar(name='b')),
-                                                             cmd=Token('BOP', '+'),
+                                                             cmd=B<mat_plus>,
                                                              exp2=ExRdVar(name='c'))),
                                      StReturn(value=ExBinary(exp1=ExRdVar(name='d'),
-                                                             cmd=Token('BOP', '%'),
+                                                             cmd=B<mat_mod>,
                                                              exp2=ExLit(value=LitInt(value=10))))]),
                   'h': DeclFun(sig=DeclFunSig(ret_type=DT<int>,
                                               name='h',
                                               args=[Var<x:DT<int>>]),
                                body=[StIf(check_expr=ExBinary(exp1=ExRdVar(name='x'),
-                                                              cmd=Token('BOP', '=='),
+                                                              cmd=B<cmp_eq>,
                                                               exp2=ExLit(value=LitInt(value=0))),
                                           br_true=[StReturn(value=ExLit(value=LitInt(value=1)))],
                                           br_false=None),
                                      StVarDecl(sig=Var<b:DT<int>>,
                                                init=ExLit(value=LitInt(value=-1))),
                                      StIf(check_expr=ExBinary(exp1=ExBinary(exp1=ExRdVar(name='x'),
-                                                                            cmd=Token('BOP', '*'),
+                                                                            cmd=B<mat_star>,
                                                                             exp2=ExLit(value=LitInt(value=5))),
-                                                              cmd=Token('BOP', '<'),
+                                                              cmd=B<cmp_lt>,
                                                               exp2=ExLit(value=LitInt(value=10))),
                                           br_true=[StAsn(dst='b',
                                                          expr=ExLit(value=LitInt(value=10))),
                                                    StAsn(dst='b',
                                                          expr=ExBinary(exp1=ExRdVar(name='b'),
-                                                                       cmd=Token('BOP', '*'),
+                                                                       cmd=B<mat_star>,
                                                                        exp2=ExRdVar(name='x')))],
                                           br_false=None),
                                      StReturn(value=ExRdVar(name='b'))]),
@@ -154,7 +154,7 @@ ast_tree: |-
                                                init=ExLit(value=LitInt(value=0))),
                                      StWhile(check_expr=ExBinary(exp1=ExUnary(cmd=U<uop_inc>,
                                                                               value=ExRdVar(name='c')),
-                                                                 cmd=Token('BOP', '<'),
+                                                                 cmd=B<cmp_lt>,
                                                                  exp2=ExLit(value=LitInt(value=10))),
                                              body=[ExCall(name='puti',
                                                           args=(ExRdVar(name='c'),)),
@@ -311,13 +311,6 @@ parse_tree: |
           ex_rd_var	a
           ex_lit
             lit_int	2
-        ex_conditional
-          ex_lit
-            lit_int	1
-          ex_lit
-            lit_int	2
-          ex_lit
-            lit_int	3
         ex_lit
           lit_int	-1
         ex_uop
@@ -341,30 +334,6 @@ parse_tree: |
             *
             ex_lit
               lit_int	3
-        ex_conditional
-          ex_binary
-            ex_lit
-              lit_int	1
-            <
-            ex_binary
-              ex_lit
-                lit_int	4
-              *
-              ex_lit
-                lit_int	5
-          ex_binary
-            ex_call	f
-            +
-            ex_uop
-              ex_postfix
-                ex_lit
-                  lit_int	3
-                --
-          ex_uop
-            ex_postfix
-              ex_lit
-                lit_int	5
-              ++
     decl_fun
       decl_fun_sig
         int

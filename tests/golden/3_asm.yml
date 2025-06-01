@@ -1,0 +1,1358 @@
+test_level: parse,ast,ir,asm
+text: |-
+  string str = "hello world!\n\t\t\tfrom qemu!!!";
+
+  void puts(string s);
+  void putc(char c);
+
+  void print_negative(int n) {
+    if (n <= -10) print_negative(n / 10);
+    putc('0' - (n % 10));
+  }
+
+  void putd(int n) {
+    if (n < 0) putc('-');
+    if (n > 0) n = -n;
+    print_negative(n);
+  }
+
+  int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+  }
+
+  void putds(int n) {
+    putd(n);
+    putc(', ');
+  }
+
+  void print_prime_divisors(int n) {
+    int d = 2;
+    while (d <= n) {
+      if (n % d == 0) {
+        int is_prime = 1;
+        int i = 2;
+        while (i * i <= d) {
+          if (d % i == 0) {
+            is_prime = 0;
+            break;
+          }
+          i++;
+        }
+        if (is_prime) putds(d);
+      }
+      d++;
+    }
+  }
+
+  void main() {  
+    puts(str);
+    putc('\n');
+
+    puts("\n\n---solving some tasks---\n\n");
+
+    puts("TASK 0: some integer math: ");
+    int v = 12345;
+    putd(v);
+    v = -52123;
+    puts(" * ");
+    putd(v);
+    puts(" = ");
+    v = 12345 * v;
+    putd(v);
+
+    puts("\n\n");
+    puts("TASK 1: some fibonacci numbers:\n");
+    int i = 9;
+    while(i++ < 15) {
+      int k = fibonacci(i);
+      puts("f(");
+      putd(i);
+      puts(") = ");
+      putd(k);
+      putc('\n');
+    }
+    puts("-> answer should be <55, 89, 144, 233, 377>\n\n");
+
+    puts("TASK 2: prime divisors of number ");
+    int x = 4095;
+    putd(x);
+    puts(": ");
+    print_prime_divisors(x);  
+    puts("\n-> answer should be <3, 5, 7, 13>\n\n");    
+  }
+
+qemu_output: |-
+  hello world!
+  			from qemu!!!
+
+
+  ---solving some tasks---
+
+  TASK 0: some integer math: 12345 * -52123 = -643458435
+
+  TASK 1: some fibonacci numbers:
+  f(10) = 55
+  f(11) = 89
+  f(12) = 144
+  f(13) = 233
+  f(14) = 377
+  -> answer should be <55, 89, 144, 233, 377>
+
+  TASK 2: prime divisors of number 4095: 3,5,7,13,
+  -> answer should be <3, 5, 7, 13>
+asm: |
+  .align 2
+  .section .data
+  gzjayvqudhvsdsla:
+  .string "hello world!\n\t\t\tfrom qemu!!!"
+  str:
+  .dword gzjayvqudhvsdsla
+  cgvosnchhbkulcxp:
+  .string "\n\n---solving some tasks---\n\n"
+  anlrrpvycgawoxfb:
+  .dword cgvosnchhbkulcxp
+  angdlpgkrczbnnzo:
+  .string "TASK 0: some integer math: "
+  vxhkdyhmcxdlrtyk:
+  .dword angdlpgkrczbnnzo
+  kmqzgauitqutibov:
+  .string " * "
+  tekcmkyajlywcroz:
+  .dword kmqzgauitqutibov
+  eumsqvbulhbfbynz:
+  .string " = "
+  jkedwlrqpaugdobt:
+  .dword eumsqvbulhbfbynz
+  ogtejuwidjxtxkzm:
+  .string "\n\n"
+  ffwidxawddgeraau:
+  .dword ogtejuwidjxtxkzm
+  mynuscpvoicrhplr:
+  .string "TASK 1: some fibonacci numbers:\n"
+  giebtntmuncnybuw:
+  .dword mynuscpvoicrhplr
+  jbwjzhzybqjurydp:
+  .string "f("
+  nlzbmkrmxbcpbhqo:
+  .dword jbwjzhzybqjurydp
+  uabujjopryjtonkq:
+  .string ") = "
+  iznlpcswqtsflfil:
+  .dword uabujjopryjtonkq
+  gctmkogglzhxmdwl:
+  .string "-> answer should be <55, 89, 144, 233, 377>\n\n"
+  kclrjdxbvcctvopo:
+  .dword gctmkogglzhxmdwl
+  xlcrvijboxwsyqun:
+  .string "TASK 2: prime divisors of number "
+  idjrtwszpjpfrfcv:
+  .dword xlcrvijboxwsyqun
+  dfduaojuopcizsnt:
+  .string ": "
+  jtouvzvpqayvgesi:
+  .dword dfduaojuopcizsnt
+  vbzqlriwuqezlxbd:
+  .string "\n-> answer should be <3, 5, 7, 13>\n\n"
+  iawokdqatfkijsuo:
+  .dword vbzqlriwuqezlxbd
+  .section .bss
+  .align 4
+  stack_bottom:
+  .space 4096
+  stack_top:
+  .section .text
+  .global _start
+  _start:
+  csrr t0, mhartid
+  bnez t0, halt
+  la sp, stack_top
+  j main
+  print_negative:
+  addi sp, sp, -112
+  sd ra, 0(sp)
+  sd fp, 8(sp)
+  sd s1, 16(sp)
+  sd s2, 24(sp)
+  sd s3, 32(sp)
+  sd s4, 40(sp)
+  sd s5, 48(sp)
+  sd s6, 56(sp)
+  sd s7, 64(sp)
+  sd s8, 72(sp)
+  sd s9, 80(sp)
+  sd a0, 88(sp)
+  li t0, -10
+  addi s1, t0, 0
+  li t0, 1
+  addi s3, t0, 0
+  add s1, s1, s3
+  ld t6, 88(sp)
+  slt s4, t6, s1
+  mv s5, s4
+  beqz s5, __xckafn
+  li t0, 10
+  addi s6, t0, 0
+  ld t6, 88(sp)
+  div s7, t6, s6
+  addi a0, s7, 0
+  call print_negative
+  addi t6, a0, 0
+  sd t6, 96(sp)
+  j __afqofp
+  __xckafn:
+  __afqofp:
+  li t0, 48
+  addi s2, t0, 0
+  li t0, 10
+  addi s8, t0, 0
+  ld t6, 88(sp)
+  rem s9, t6, s8
+  sub s2, s2, s9
+  addi a0, s2, 0
+  call putc
+  addi t6, a0, 0
+  sd t6, 104(sp)
+  __exit_print_negative:
+  ld s9, 80(sp)
+  ld s8, 72(sp)
+  ld s7, 64(sp)
+  ld s6, 56(sp)
+  ld s5, 48(sp)
+  ld s4, 40(sp)
+  ld s3, 32(sp)
+  ld s2, 24(sp)
+  ld s1, 16(sp)
+  ld fp, 8(sp)
+  ld ra, 0(sp)
+  addi sp, sp, 112
+  jr ra
+  putd:
+  addi sp, sp, -96
+  sd ra, 0(sp)
+  sd fp, 8(sp)
+  sd s1, 16(sp)
+  sd s2, 24(sp)
+  sd s3, 32(sp)
+  sd s4, 40(sp)
+  sd s5, 48(sp)
+  sd s6, 56(sp)
+  sd s7, 64(sp)
+  sd a0, 72(sp)
+  li t0, 0
+  addi s1, t0, 0
+  ld t6, 72(sp)
+  slt s2, t6, s1
+  mv s3, s2
+  beqz s3, __kfzncb
+  li t0, 45
+  addi s4, t0, 0
+  addi a0, s4, 0
+  call putc
+  addi t6, a0, 0
+  sd t6, 80(sp)
+  j __cqukbj
+  __kfzncb:
+  __cqukbj:
+  li t0, 0
+  addi s5, t0, 0
+  ld t6, 72(sp)
+  slt s6, s5, t6
+  mv s7, s6
+  beqz s7, __aywvhb
+  ld t6, 72(sp)
+  neg t5, t6
+  sd t5, 72(sp)
+  ld t6, 72(sp)
+  mv t5, t6
+  sd t5, 72(sp)
+  j __wycmbt
+  __aywvhb:
+  __wycmbt:
+  ld t6, 72(sp)
+  addi a0, t6, 0
+  call print_negative
+  addi t5, a0, 0
+  sd t5, 88(sp)
+  __exit_putd:
+  ld s7, 64(sp)
+  ld s6, 56(sp)
+  ld s5, 48(sp)
+  ld s4, 40(sp)
+  ld s3, 32(sp)
+  ld s2, 24(sp)
+  ld s1, 16(sp)
+  ld fp, 8(sp)
+  ld ra, 0(sp)
+  addi sp, sp, 96
+  jr ra
+  fibonacci:
+  addi sp, sp, -120
+  sd ra, 0(sp)
+  sd fp, 8(sp)
+  sd s1, 16(sp)
+  sd s2, 24(sp)
+  sd s3, 32(sp)
+  sd s4, 40(sp)
+  sd s5, 48(sp)
+  sd s6, 56(sp)
+  sd s7, 64(sp)
+  sd s8, 72(sp)
+  sd s9, 80(sp)
+  sd s10, 88(sp)
+  sd s11, 96(sp)
+  sd a0, 104(sp)
+  li t0, 1
+  addi s1, t0, 0
+  li t0, 1
+  addi s3, t0, 0
+  add s1, s1, s3
+  ld t6, 104(sp)
+  slt s4, t6, s1
+  mv s5, s4
+  beqz s5, __fxwbgr
+  ld t6, 104(sp)
+  mv s6, t6
+  addi a0, s6, 0
+  j __exit_fibonacci
+  j __fdyomu
+  __fxwbgr:
+  __fdyomu:
+  li t0, 1
+  addi s7, t0, 0
+  ld t6, 104(sp)
+  sub s8, t6, s7
+  addi a0, s8, 0
+  call fibonacci
+  addi s2, a0, 0
+  li t0, 2
+  addi s9, t0, 0
+  ld t6, 104(sp)
+  sub s10, t6, s9
+  addi a0, s10, 0
+  call fibonacci
+  addi s11, a0, 0
+  add s2, s2, s11
+  mv t6, s2
+  sd t6, 112(sp)
+  ld t6, 112(sp)
+  addi a0, t6, 0
+  j __exit_fibonacci
+  __exit_fibonacci:
+  ld s11, 96(sp)
+  ld s10, 88(sp)
+  ld s9, 80(sp)
+  ld s8, 72(sp)
+  ld s7, 64(sp)
+  ld s6, 56(sp)
+  ld s5, 48(sp)
+  ld s4, 40(sp)
+  ld s3, 32(sp)
+  ld s2, 24(sp)
+  ld s1, 16(sp)
+  ld fp, 8(sp)
+  ld ra, 0(sp)
+  addi sp, sp, 120
+  jr ra
+  putds:
+  addi sp, sp, -48
+  sd ra, 0(sp)
+  sd fp, 8(sp)
+  sd s1, 16(sp)
+  sd a0, 24(sp)
+  ld t6, 24(sp)
+  addi a0, t6, 0
+  call putd
+  addi t5, a0, 0
+  sd t5, 32(sp)
+  li t0, 44
+  addi s1, t0, 0
+  addi a0, s1, 0
+  call putc
+  addi t6, a0, 0
+  sd t6, 40(sp)
+  __exit_putds:
+  ld s1, 16(sp)
+  ld fp, 8(sp)
+  ld ra, 0(sp)
+  addi sp, sp, 48
+  jr ra
+  print_prime_divisors:
+  addi sp, sp, -216
+  sd ra, 0(sp)
+  sd fp, 8(sp)
+  sd s1, 16(sp)
+  sd s2, 24(sp)
+  sd s3, 32(sp)
+  sd s4, 40(sp)
+  sd s5, 48(sp)
+  sd s6, 56(sp)
+  sd s7, 64(sp)
+  sd s8, 72(sp)
+  sd s9, 80(sp)
+  sd s10, 88(sp)
+  sd s11, 96(sp)
+  sd a0, 104(sp)
+  li t0, 2
+  addi s8, t0, 0
+  mv s1, s8
+  __vspzra:
+  __qgmxvc:
+  li t0, 1
+  addi s9, t0, 0
+  ld t6, 104(sp)
+  add s10, t6, s9
+  slt s11, s1, s10
+  mv t6, s11
+  sd t6, 112(sp)
+  ld t6, 112(sp)
+  beqz t6, __vhrydd
+  __cohpsf:
+  ld t6, 104(sp)
+  rem s3, t6, s1
+  li t0, 0
+  addi t6, t0, 0
+  sd t6, 120(sp)
+  ld t6, 120(sp)
+  sub t0, s3, t6
+  seqz s3, t0
+  mv t6, s3
+  sd t6, 128(sp)
+  ld t6, 128(sp)
+  beqz t6, __eywzvw
+  li t0, 1
+  addi t6, t0, 0
+  sd t6, 136(sp)
+  ld t6, 136(sp)
+  mv s7, t6
+  li t0, 2
+  addi t6, t0, 0
+  sd t6, 144(sp)
+  ld t6, 144(sp)
+  mv s2, t6
+  __zezgcl:
+  __trjbri:
+  mul s4, s2, s2
+  li t0, 1
+  addi t6, t0, 0
+  sd t6, 152(sp)
+  ld t6, 152(sp)
+  add t5, s1, t6
+  sd t5, 160(sp)
+  ld t6, 160(sp)
+  slt s4, s4, t6
+  mv t6, s4
+  sd t6, 168(sp)
+  ld t6, 168(sp)
+  beqz t6, __sipnko
+  __gsayns:
+  rem s5, s1, s2
+  li t0, 0
+  addi t6, t0, 0
+  sd t6, 176(sp)
+  ld t6, 176(sp)
+  sub t0, s5, t6
+  seqz s5, t0
+  mv t6, s5
+  sd t6, 184(sp)
+  ld t6, 184(sp)
+  beqz t6, __qivtrf
+  li t0, 0
+  addi t6, t0, 0
+  sd t6, 192(sp)
+  ld t6, 192(sp)
+  mv s7, t6
+  j __sipnko
+  j __fagmwb
+  __qivtrf:
+  __fagmwb:
+  li t0, 1
+  addi s6, t0, 0
+  add s2, s2, s6
+  j __trjbri
+  __sipnko:
+  mv t6, s7
+  sd t6, 200(sp)
+  ld t6, 200(sp)
+  beqz t6, __xpsnvo
+  addi a0, s1, 0
+  call putds
+  addi t6, a0, 0
+  sd t6, 208(sp)
+  j __xtmggq
+  __xpsnvo:
+  __xtmggq:
+  j __atiyuw
+  __eywzvw:
+  __atiyuw:
+  li t0, 1
+  addi s6, t0, 0
+  add s1, s1, s6
+  j __qgmxvc
+  __vhrydd:
+  __exit_print_prime_divisors:
+  ld s11, 96(sp)
+  ld s10, 88(sp)
+  ld s9, 80(sp)
+  ld s8, 72(sp)
+  ld s7, 64(sp)
+  ld s6, 56(sp)
+  ld s5, 48(sp)
+  ld s4, 40(sp)
+  ld s3, 32(sp)
+  ld s2, 24(sp)
+  ld s1, 16(sp)
+  ld fp, 8(sp)
+  ld ra, 0(sp)
+  addi sp, sp, 216
+  jr ra
+  main:
+  addi sp, sp, -416
+  sd ra, 0(sp)
+  sd fp, 8(sp)
+  sd s1, 16(sp)
+  sd s2, 24(sp)
+  sd s3, 32(sp)
+  sd s4, 40(sp)
+  sd s5, 48(sp)
+  sd s6, 56(sp)
+  sd s7, 64(sp)
+  sd s8, 72(sp)
+  sd s9, 80(sp)
+  sd s10, 88(sp)
+  sd s11, 96(sp)
+  la t0, str
+  ld t6, 0(t0)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 240(sp)
+  li t0, 10
+  addi s5, t0, 0
+  addi a0, s5, 0
+  call putc
+  addi t6, a0, 0
+  sd t6, 248(sp)
+  la t0, anlrrpvycgawoxfb
+  ld s6, 0(t0)
+  addi a0, s6, 0
+  call puts
+  addi t6, a0, 0
+  sd t6, 256(sp)
+  la t0, vxhkdyhmcxdlrtyk
+  ld s7, 0(t0)
+  addi a0, s7, 0
+  call puts
+  addi t6, a0, 0
+  sd t6, 264(sp)
+  li t0, 12345
+  addi s8, t0, 0
+  mv s1, s8
+  addi a0, s1, 0
+  call putd
+  addi t6, a0, 0
+  sd t6, 272(sp)
+  li t0, -52123
+  addi s9, t0, 0
+  mv s1, s9
+  la t0, tekcmkyajlywcroz
+  ld s10, 0(t0)
+  addi a0, s10, 0
+  call puts
+  addi t6, a0, 0
+  sd t6, 280(sp)
+  addi a0, s1, 0
+  call putd
+  addi t6, a0, 0
+  sd t6, 288(sp)
+  la t0, jkedwlrqpaugdobt
+  ld s11, 0(t0)
+  addi a0, s11, 0
+  call puts
+  addi t6, a0, 0
+  sd t6, 296(sp)
+  li t0, 12345
+  addi s3, t0, 0
+  mul s3, s3, s1
+  mv s1, s3
+  addi a0, s1, 0
+  call putd
+  addi t6, a0, 0
+  sd t6, 304(sp)
+  la t0, ffwidxawddgeraau
+  ld t6, 0(t0)
+  sd t6, 104(sp)
+  ld t6, 104(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 312(sp)
+  la t0, giebtntmuncnybuw
+  ld t6, 0(t0)
+  sd t6, 112(sp)
+  ld t6, 112(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 320(sp)
+  li t0, 9
+  addi t6, t0, 0
+  sd t6, 120(sp)
+  ld t6, 120(sp)
+  mv s2, t6
+  __iwshay:
+  __pmnlti:
+  li t0, 1
+  addi t6, t0, 0
+  sd t6, 128(sp)
+  ld t6, 128(sp)
+  add s2, s2, t6
+  li t0, 15
+  addi t6, t0, 0
+  sd t6, 136(sp)
+  ld t6, 136(sp)
+  slt t5, s2, t6
+  sd t5, 144(sp)
+  ld t6, 144(sp)
+  mv t5, t6
+  sd t5, 152(sp)
+  ld t6, 152(sp)
+  beqz t6, __csmtrq
+  __mucfrh:
+  addi a0, s2, 0
+  call fibonacci
+  addi t6, a0, 0
+  sd t6, 160(sp)
+  ld t6, 160(sp)
+  mv t5, t6
+  sd t5, 168(sp)
+  la t0, nlzbmkrmxbcpbhqo
+  ld t6, 0(t0)
+  sd t6, 176(sp)
+  ld t6, 176(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 328(sp)
+  addi a0, s2, 0
+  call putd
+  addi t6, a0, 0
+  sd t6, 336(sp)
+  la t0, iznlpcswqtsflfil
+  ld t6, 0(t0)
+  sd t6, 184(sp)
+  ld t6, 184(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 344(sp)
+  ld t6, 168(sp)
+  addi a0, t6, 0
+  call putd
+  addi t5, a0, 0
+  sd t5, 352(sp)
+  li t0, 10
+  addi t6, t0, 0
+  sd t6, 192(sp)
+  ld t6, 192(sp)
+  addi a0, t6, 0
+  call putc
+  addi t5, a0, 0
+  sd t5, 360(sp)
+  j __pmnlti
+  __csmtrq:
+  la t0, kclrjdxbvcctvopo
+  ld t6, 0(t0)
+  sd t6, 200(sp)
+  ld t6, 200(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 368(sp)
+  la t0, idjrtwszpjpfrfcv
+  ld t6, 0(t0)
+  sd t6, 208(sp)
+  ld t6, 208(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 376(sp)
+  li t0, 4095
+  addi t6, t0, 0
+  sd t6, 216(sp)
+  ld t6, 216(sp)
+  mv s4, t6
+  addi a0, s4, 0
+  call putd
+  addi t6, a0, 0
+  sd t6, 384(sp)
+  la t0, jtouvzvpqayvgesi
+  ld t6, 0(t0)
+  sd t6, 224(sp)
+  ld t6, 224(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 392(sp)
+  addi a0, s4, 0
+  call print_prime_divisors
+  addi t6, a0, 0
+  sd t6, 400(sp)
+  la t0, iawokdqatfkijsuo
+  ld t6, 0(t0)
+  sd t6, 232(sp)
+  ld t6, 232(sp)
+  addi a0, t6, 0
+  call puts
+  addi t5, a0, 0
+  sd t5, 408(sp)
+  __exit_main:
+  ld s11, 96(sp)
+  ld s10, 88(sp)
+  ld s9, 80(sp)
+  ld s8, 72(sp)
+  ld s7, 64(sp)
+  ld s6, 56(sp)
+  ld s5, 48(sp)
+  ld s4, 40(sp)
+  ld s3, 32(sp)
+  ld s2, 24(sp)
+  ld s1, 16(sp)
+  ld fp, 8(sp)
+  ld ra, 0(sp)
+  addi sp, sp, 416
+  jr ra
+  halt:
+  j halt
+ir_text: |-
+  IRProg(functions=[IRFun(name='print_negative',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='n', type=<IRType.INT: 'int'>)],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__vausie',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=-10)),
+                                IRStStoreValue(label=None,
+                                               dest='__yiccwp',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__vausie',
+                                          arg1='__vausie',
+                                          arg2='__yiccwp'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__usnzjo',
+                                          arg1='n',
+                                          arg2='__vausie'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__qahftr',
+                                         arg='__usnzjo'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__qahftr',
+                                          jump_to='__xckafn'),
+                                IRStStoreValue(label=None,
+                                               dest='__vqwpsb',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.DIV: 'div'>,
+                                          dest='__fhcgch',
+                                          arg1='n',
+                                          arg2='__vqwpsb'),
+                                IRStCall(label=None,
+                                         fun_name='print_negative',
+                                         arg_vars=['__fhcgch'],
+                                         assign_var='__qjjfgy'),
+                                IRStJump(label=None, target='__afqofp'),
+                                IRStatement(label='__xckafn'),
+                                IRStatement(label='__afqofp'),
+                                IRStStoreValue(label=None,
+                                               dest='__qpesej',
+                                               value=IRCharValue(type=<IRType.INT: 'int'>, value='0')),
+                                IRStStoreValue(label=None,
+                                               dest='__zqorvu',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=10)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.REM: 'rem'>,
+                                          dest='__faigfy',
+                                          arg1='n',
+                                          arg2='__zqorvu'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.SUB: 'sub'>,
+                                          dest='__qpesej',
+                                          arg1='__qpesej',
+                                          arg2='__faigfy'),
+                                IRStCall(label=None,
+                                         fun_name='putc',
+                                         arg_vars=['__qpesej'],
+                                         assign_var='__wirkxl')],
+                          layout=None),
+                    IRFun(name='putd',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='n', type=<IRType.INT: 'int'>)],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__znzwas',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__rngqcl',
+                                          arg1='n',
+                                          arg2='__znzwas'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__ggogpx',
+                                         arg='__rngqcl'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__ggogpx',
+                                          jump_to='__kfzncb'),
+                                IRStStoreValue(label=None,
+                                               dest='__lywgne',
+                                               value=IRCharValue(type=<IRType.INT: 'int'>, value='-')),
+                                IRStCall(label=None,
+                                         fun_name='putc',
+                                         arg_vars=['__lywgne'],
+                                         assign_var='__xwhqpd'),
+                                IRStJump(label=None, target='__cqukbj'),
+                                IRStatement(label='__kfzncb'),
+                                IRStatement(label='__cqukbj'),
+                                IRStStoreValue(label=None,
+                                               dest='__tdmogw',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CGT: 'cgt'>,
+                                          dest='__lfosfi',
+                                          arg1='n',
+                                          arg2='__tdmogw'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__tounai',
+                                         arg='__lfosfi'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__tounai',
+                                          jump_to='__aywvhb'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.MINUS: 'minus'>,
+                                         dest='n',
+                                         arg='n'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='n',
+                                         arg='n'),
+                                IRStJump(label=None, target='__wycmbt'),
+                                IRStatement(label='__aywvhb'),
+                                IRStatement(label='__wycmbt'),
+                                IRStCall(label=None,
+                                         fun_name='print_negative',
+                                         arg_vars=['n'],
+                                         assign_var='__zqlndf')],
+                          layout=None),
+                    IRFun(name='fibonacci',
+                          ret_typ=<IRType.INT: 'int'>,
+                          params=[IRFunParam(name='n', type=<IRType.INT: 'int'>)],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__uecllm',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStStoreValue(label=None,
+                                               dest='__srzcki',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__uecllm',
+                                          arg1='__uecllm',
+                                          arg2='__srzcki'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__wgelkh',
+                                          arg1='n',
+                                          arg2='__uecllm'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__ipffbq',
+                                         arg='__wgelkh'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__ipffbq',
+                                          jump_to='__fxwbgr'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__gylwob',
+                                         arg='n'),
+                                IRStReturn(label=None, var='__gylwob'),
+                                IRStJump(label=None, target='__fdyomu'),
+                                IRStatement(label='__fxwbgr'),
+                                IRStatement(label='__fdyomu'),
+                                IRStStoreValue(label=None,
+                                               dest='__mfkbjz',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.SUB: 'sub'>,
+                                          dest='__gulkyz',
+                                          arg1='n',
+                                          arg2='__mfkbjz'),
+                                IRStCall(label=None,
+                                         fun_name='fibonacci',
+                                         arg_vars=['__gulkyz'],
+                                         assign_var='__osehzp'),
+                                IRStStoreValue(label=None,
+                                               dest='__otbpnw',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=2)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.SUB: 'sub'>,
+                                          dest='__eycepr',
+                                          arg1='n',
+                                          arg2='__otbpnw'),
+                                IRStCall(label=None,
+                                         fun_name='fibonacci',
+                                         arg_vars=['__eycepr'],
+                                         assign_var='__gdxgpq'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__osehzp',
+                                          arg1='__osehzp',
+                                          arg2='__gdxgpq'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__zvzywe',
+                                         arg='__osehzp'),
+                                IRStReturn(label=None, var='__zvzywe')],
+                          layout=None),
+                    IRFun(name='putds',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='n', type=<IRType.INT: 'int'>)],
+                          body=[IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['n'],
+                                         assign_var='__kpnyfs'),
+                                IRStStoreValue(label=None,
+                                               dest='__gkrhit',
+                                               value=IRCharValue(type=<IRType.INT: 'int'>, value=',')),
+                                IRStCall(label=None,
+                                         fun_name='putc',
+                                         arg_vars=['__gkrhit'],
+                                         assign_var='__blzzbf')],
+                          layout=None),
+                    IRFun(name='print_prime_divisors',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='n', type=<IRType.INT: 'int'>)],
+                          body=[IRStStoreValue(label=None,
+                                               dest='__gywwje',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=2)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='d',
+                                         arg='__gywwje'),
+                                IRStatement(label='__vspzra'),
+                                IRStatement(label='__qgmxvc'),
+                                IRStStoreValue(label=None,
+                                               dest='__tolabw',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__xovpdd',
+                                          arg1='n',
+                                          arg2='__tolabw'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__ixuwxf',
+                                          arg1='d',
+                                          arg2='__xovpdd'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__lhauqg',
+                                         arg='__ixuwxf'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__lhauqg',
+                                          jump_to='__vhrydd'),
+                                IRStatement(label='__cohpsf'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.REM: 'rem'>,
+                                          dest='__vgucww',
+                                          arg1='n',
+                                          arg2='d'),
+                                IRStStoreValue(label=None,
+                                               dest='__fvlhuf',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CEQ: 'ceq'>,
+                                          dest='__vgucww',
+                                          arg1='__vgucww',
+                                          arg2='__fvlhuf'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__gcuwkq',
+                                         arg='__vgucww'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__gcuwkq',
+                                          jump_to='__eywzvw'),
+                                IRStStoreValue(label=None,
+                                               dest='__afiwzh',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='is_prime',
+                                         arg='__afiwzh'),
+                                IRStStoreValue(label=None,
+                                               dest='__qkznyc',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=2)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='i',
+                                         arg='__qkznyc'),
+                                IRStatement(label='__zezgcl'),
+                                IRStatement(label='__trjbri'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__khdkyr',
+                                          arg1='i',
+                                          arg2='i'),
+                                IRStStoreValue(label=None,
+                                               dest='__xqhoah',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='__lprmlf',
+                                          arg1='d',
+                                          arg2='__xqhoah'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__khdkyr',
+                                          arg1='__khdkyr',
+                                          arg2='__lprmlf'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__iwshik',
+                                         arg='__khdkyr'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__iwshik',
+                                          jump_to='__sipnko'),
+                                IRStatement(label='__gsayns'),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.REM: 'rem'>,
+                                          dest='__kqfsmg',
+                                          arg1='d',
+                                          arg2='i'),
+                                IRStStoreValue(label=None,
+                                               dest='__ratucl',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CEQ: 'ceq'>,
+                                          dest='__kqfsmg',
+                                          arg1='__kqfsmg',
+                                          arg2='__ratucl'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__mxuecn',
+                                         arg='__kqfsmg'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__mxuecn',
+                                          jump_to='__qivtrf'),
+                                IRStStoreValue(label=None,
+                                               dest='__eynbgw',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=0)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='is_prime',
+                                         arg='__eynbgw'),
+                                IRStJump(label=None, target='__sipnko'),
+                                IRStJump(label=None, target='__fagmwb'),
+                                IRStatement(label='__qivtrf'),
+                                IRStatement(label='__fagmwb'),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='i',
+                                          arg1='i',
+                                          arg2='1'),
+                                IRStJump(label=None, target='__trjbri'),
+                                IRStatement(label='__sipnko'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__lurzpy',
+                                         arg='is_prime'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__lurzpy',
+                                          jump_to='__xpsnvo'),
+                                IRStCall(label=None,
+                                         fun_name='putds',
+                                         arg_vars=['d'],
+                                         assign_var='__tnqhch'),
+                                IRStJump(label=None, target='__xtmggq'),
+                                IRStatement(label='__xpsnvo'),
+                                IRStatement(label='__xtmggq'),
+                                IRStJump(label=None, target='__atiyuw'),
+                                IRStatement(label='__eywzvw'),
+                                IRStatement(label='__atiyuw'),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='d',
+                                          arg1='d',
+                                          arg2='1'),
+                                IRStJump(label=None, target='__qgmxvc'),
+                                IRStatement(label='__vhrydd')],
+                          layout=None),
+                    IRFun(name='main',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[],
+                          body=[IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['str'],
+                                         assign_var='__hiodgs'),
+                                IRStStoreValue(label=None,
+                                               dest='__sbkokf',
+                                               value=IRCharValue(type=<IRType.INT: 'int'>,
+                                                                 value='\n')),
+                                IRStCall(label=None,
+                                         fun_name='putc',
+                                         arg_vars=['__sbkokf'],
+                                         assign_var='__kxpswt'),
+                                IRStStoreValue(label=None,
+                                               dest='__jajtwy',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='\n'
+                                                                         '\n'
+                                                                         '---solving some tasks---\n'
+                                                                         '\n')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__jajtwy'],
+                                         assign_var='__ktopff'),
+                                IRStStoreValue(label=None,
+                                               dest='__lairke',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='TASK 0: some integer '
+                                                                         'math: ')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__lairke'],
+                                         assign_var='__mdqako'),
+                                IRStStoreValue(label=None,
+                                               dest='__aqdmbj',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>,
+                                                                value=12345)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='v',
+                                         arg='__aqdmbj'),
+                                IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['v'],
+                                         assign_var='__fitjtv'),
+                                IRStStoreValue(label=None,
+                                               dest='__gcaozj',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>,
+                                                                value=-52123)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='v',
+                                         arg='__gcaozj'),
+                                IRStStoreValue(label=None,
+                                               dest='__quqtyf',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value=' * ')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__quqtyf'],
+                                         assign_var='__addrof'),
+                                IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['v'],
+                                         assign_var='__steptc'),
+                                IRStStoreValue(label=None,
+                                               dest='__vzcair',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value=' = ')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__vzcair'],
+                                         assign_var='__yksbrq'),
+                                IRStStoreValue(label=None,
+                                               dest='__cuwpdz',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>,
+                                                                value=12345)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.MUL: 'mul'>,
+                                          dest='__cuwpdz',
+                                          arg1='__cuwpdz',
+                                          arg2='v'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='v',
+                                         arg='__cuwpdz'),
+                                IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['v'],
+                                         assign_var='__ujljni'),
+                                IRStStoreValue(label=None,
+                                               dest='__wvcyqv',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='\n\n')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__wvcyqv'],
+                                         assign_var='__sltzhv'),
+                                IRStStoreValue(label=None,
+                                               dest='__nmltgw',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='TASK 1: some fibonacci '
+                                                                         'numbers:\n')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__nmltgw'],
+                                         assign_var='__vcwgmp'),
+                                IRStStoreValue(label=None,
+                                               dest='__jawefu',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=9)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='i',
+                                         arg='__jawefu'),
+                                IRStatement(label='__iwshay'),
+                                IRStatement(label='__pmnlti'),
+                                IRStStoreValue(label=None,
+                                               dest='1',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=1)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.ADD: 'add'>,
+                                          dest='i',
+                                          arg1='i',
+                                          arg2='1'),
+                                IRStStoreValue(label=None,
+                                               dest='__ntefms',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=15)),
+                                IRStBinOp(label=None,
+                                          operation=<IRBOp.CLT: 'clt'>,
+                                          dest='__znhcff',
+                                          arg1='i',
+                                          arg2='__ntefms'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='__shgdfd',
+                                         arg='__znhcff'),
+                                IRStCJump(label=None,
+                                          check_type=<IRCJumpType.JZ: 'jz'>,
+                                          checked_var='__shgdfd',
+                                          jump_to='__csmtrq'),
+                                IRStatement(label='__mucfrh'),
+                                IRStCall(label=None,
+                                         fun_name='fibonacci',
+                                         arg_vars=['i'],
+                                         assign_var='__eanhzo'),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='k',
+                                         arg='__eanhzo'),
+                                IRStStoreValue(label=None,
+                                               dest='__sdwmwo',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='f(')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__sdwmwo'],
+                                         assign_var='__mlebym'),
+                                IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['i'],
+                                         assign_var='__vkbqbd'),
+                                IRStStoreValue(label=None,
+                                               dest='__ohzdtp',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value=') = ')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__ohzdtp'],
+                                         assign_var='__ufnllw'),
+                                IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['k'],
+                                         assign_var='__zhqpty'),
+                                IRStStoreValue(label=None,
+                                               dest='__ffreeb',
+                                               value=IRCharValue(type=<IRType.INT: 'int'>,
+                                                                 value='\n')),
+                                IRStCall(label=None,
+                                         fun_name='putc',
+                                         arg_vars=['__ffreeb'],
+                                         assign_var='__alphgs'),
+                                IRStJump(label=None, target='__pmnlti'),
+                                IRStatement(label='__csmtrq'),
+                                IRStStoreValue(label=None,
+                                               dest='__slryuq',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='-> answer should be <55, '
+                                                                         '89, 144, 233, 377>\n'
+                                                                         '\n')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__slryuq'],
+                                         assign_var='__ryloqx'),
+                                IRStStoreValue(label=None,
+                                               dest='__vbehto',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='TASK 2: prime divisors of '
+                                                                         'number ')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__vbehto'],
+                                         assign_var='__hdrsyn'),
+                                IRStStoreValue(label=None,
+                                               dest='__mcblig',
+                                               value=IRIntValue(type=<IRType.INT: 'int'>, value=4095)),
+                                IRStUnOp(label=None,
+                                         operation=<IRUOp.COPY: 'copy'>,
+                                         dest='x',
+                                         arg='__mcblig'),
+                                IRStCall(label=None,
+                                         fun_name='putd',
+                                         arg_vars=['x'],
+                                         assign_var='__czvoyz'),
+                                IRStStoreValue(label=None,
+                                               dest='__rhbtmq',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value=': ')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__rhbtmq'],
+                                         assign_var='__xepqmc'),
+                                IRStCall(label=None,
+                                         fun_name='print_prime_divisors',
+                                         arg_vars=['x'],
+                                         assign_var='__jirwis'),
+                                IRStStoreValue(label=None,
+                                               dest='__hyvoli',
+                                               value=IRStringValue(type=<IRType.STRING: 'string'>,
+                                                                   value='\n'
+                                                                         '-> answer should be <3, 5, '
+                                                                         '7, 13>\n'
+                                                                         '\n')),
+                                IRStCall(label=None,
+                                         fun_name='puts',
+                                         arg_vars=['__hyvoli'],
+                                         assign_var='__izknzr')],
+                          layout=None),
+                    IRFun(name='puts',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='s', type=<IRType.STRING: 'string'>)],
+                          body=None,
+                          layout=None),
+                    IRFun(name='putc',
+                          ret_typ=<IRType.VOID: 'void'>,
+                          params=[IRFunParam(name='c', type=<IRType.CHAR: 'char'>)],
+                          body=None,
+                          layout=None)],
+         globals=[IRGlobal(name='str',
+                           type=<IRType.STRING: 'string'>,
+                           val=IRStringValue(type=<IRType.STRING: 'string'>,
+                                             value='hello world!\n\t\t\tfrom qemu!!!'))])
